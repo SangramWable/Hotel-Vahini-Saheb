@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Contact | Hotel Vahinisaheb</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+<header>
+
+    <nav class="navbar">
+
+        <a href="home.html" class="brand">
+
+            <img src="./logo.jpeg">
+
+            <div class="brand-text">
+
+                <h3>Hotel Vahinisaheb</h3>
+
+                <p>
+                    Authentic Maharashtrian Taste
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <div class="menu-toggle"
+             onclick="toggleMenu()">
+            ☰
+        </div>
+
+
+        <ul class="nav-links" id="navLinks">
+
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+
+            <li>
+                <a href="menu.html">Menu</a>
+            </li>
+
+            <li>
+                <a href="build-your-meal.html">
+                    Build Your Meal
+                </a>
+            </li>
+
+            <li>
+                <a href="ai-recommendation.html">
+                    AI Recommendation
+                </a>
+            </li>
+
+            <li>
+                <a href="gallery.html">
+                    Gallery
+                </a>
+            </li>
+
+            <li>
+                <a href="about.html">
+                    About
+                </a>
+            </li>
+
+            <li>
+                <a href="reviews.html">
+                    Reviews
+                </a>
+            </li>
+
+            <li>
+                <a class="active"
+                   href="contact.html">
+                    Contact
+                </a>
+            </li>
+
+            <li>
+    <a href="admin-login.html">
+        🔐 Admin
+    </a>
+             </li> 
+
+        </ul>
+
+    </nav>
+
+</header>
+
+
+<section id="contact">
+
+    <div class="section-title">
+
+        <span>Visit Us</span>
+
+        <h2>
+            Contact Hotel Vahinisaheb
+        </h2>
+
+        <p>
+            We'd love to welcome you and your family.
+        </p>
+
+    </div>
+
+
+    <div class="contact-grid">
+
+
+        <div class="contact-card">
+
+            <h3>
+                📍 Restaurant Information
+            </h3>
+
+            <div class="contact-item">
+                📍 Shikrapur, Pune, Maharashtra
+            </div>
+
+            <div class="contact-item">
+                📞 +91 XXXXX XXXXX
+            </div>
+
+            <div class="contact-item">
+                🕐 11:00 AM – 11:00 PM
+            </div>
+
+            <div class="contact-item">
+                ⭐ 4.8 / 5 Customer Rating
+            </div>
+
+            <br>
+
+            <button class="primary-btn">
+                📍 Get Directions
+            </button>
+
+        </div>
+
+
+        <div class="contact-card">
+
+            <h3>
+                💬 Send Feedback
+            </h3>
+
+            <form class="feedback-form"
+                  onsubmit="submitFeedback(event)">
+
+                <input type="text"
+                       placeholder="Your Name"
+                       required>
+
+                <input type="email"
+                       placeholder="Your Email"
+                       required>
+
+                <textarea
+                    placeholder="Your feedback or suggestion..."
+                    required>
+                </textarea>
+
+                <button type="submit"
+                        class="primary-btn">
+
+                    Send Feedback
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <div class="map-card">
+
+        <iframe
+            src="https://www.google.com/maps?q=Shikrapur,Pune,Maharashtra&output=embed"
+            loading="lazy"
+            title="Hotel Vahinisaheb location map">
+        </iframe>
+
+    </div>
+
+
+    <div style="text-align:center;margin-top:20px;">
+
+        <a class="secondary-btn"
+           href="https://www.google.com/maps/search/?api=1&query=Shikrapur%2CPune%2CMaharashtra"
+           target="_blank"
+           rel="noopener">
+
+            📍 Open in Google Maps
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<section id="admin"
+         class="admin-preview">
+
+    <div class="section-title">
+
+        <span>Owner Tools</span>
+
+        <h2>
+            Admin Dashboard
+        </h2>
+
+        <p>
+            Demo preview for managing menu items,
+            prices, gallery, feedback and restaurant information.
+        </p>
+
+    </div>
+
+
+    <div class="admin-grid">
+
+        <div class="admin-card">
+            <span>Menu Items</span>
+            <strong>24</strong>
+        </div>
+
+        <div class="admin-card">
+            <span>Gallery Photos</span>
+            <strong>18</strong>
+        </div>
+
+        <div class="admin-card">
+            <span>Feedback</span>
+            <strong>126</strong>
+        </div>
+
+        <div class="admin-card">
+            <span>Rating</span>
+            <strong>4.8 ★</strong>
+        </div>
+
+    </div>
+
+</section>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

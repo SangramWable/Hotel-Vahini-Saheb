@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback Management | Hotel Vahinisaheb Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill-btn {
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #f7e7b4;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-pill-btn:hover {
+            background: #d4af37;
+            color: #120b06;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .nav-logout-btn {
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-logout-btn:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .stats-summary-grid {
+            max-width: 1100px;
+            margin: 0 auto 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 155, 60, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-3px);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .stat-box span {
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-box strong {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #d4af37;
+        }
+
+        .admin-controls-bar {
+            max-width: 1100px;
+            margin: 0 auto 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px;
+            background: #140d08;
+            border: 1px solid rgba(200, 155, 60, 0.3);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #d4af37;
+        }
+
+        /* Feedback cards */
+        .feedback-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(200, 155, 60, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .feedback-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .feedback-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            font-family: 'Cinzel', serif;
+        }
+
+        .feedback-user-meta h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .feedback-user-meta a {
+            font-size: 0.85rem;
+            color: #d4af37;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .feedback-user-meta a:hover {
+            text-decoration: underline;
+        }
+
+        .feedback-date {
+            font-size: 0.75rem;
+            color: #888;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .feedback-message-body {
+            font-size: 0.95rem;
+            color: #ddd;
+            line-height: 1.6;
+            margin: 16px 0 20px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 14px 18px;
+            border-radius: 10px;
+            border-left: 3px solid #d4af37;
+        }
+
+        .feedback-actions-row {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 16px;
+        }
+
+        .btn-reply {
+            flex: 2;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+        }
+
+        .btn-reply:hover {
+            background: #d4af37;
+            color: #120b06;
+        }
+
+        .btn-dismiss {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-dismiss:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* Toast */
+        .admin-toast {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+        }
+        .toast-success { background: #14532d; border: 1px solid #22c55e; color: #bbf7d0; }
+        .toast-error { background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <nav class="navbar">
+        <a href="admin-dashboard.html" class="brand">
+            <img src="./logo.jpeg" alt="Logo">
+            <div class="brand-text">
+                <h3>Hotel Vahinisaheb</h3>
+                <p>Admin Panel</p>
+            </div>
+        </a>
+
+        <div class="admin-nav-actions">
+            <a href="admin-dashboard.html" class="nav-pill-btn">
+                📊 Dashboard
+            </a>
+            <a href="menu.html" target="_blank" class="nav-pill-btn">
+                🌐 Live Menu
+            </a>
+            <a href="reviews.html" target="_blank" class="nav-pill-btn">
+                ⭐ Live Reviews
+            </a>
+            <a href="contact.html" target="_blank" class="nav-pill-btn">
+                📞 Contact
+            </a>
+            <button class="nav-logout-btn" onclick="logout()">
+                🚪 Logout
+            </button>
+        </div>
+    </nav>
+</header>
+
+
+<section id="contact" style="padding-top:110px;">
+
+    <div class="section-title">
+        <span>Owner Inbox</span>
+        <h2>💬 Customer Feedback & Queries</h2>
+        <p>
+            Review inquiries, dining feedback, and suggestions submitted by guests through the contact form.
+        </p>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="stats-summary-grid">
+        <div class="stat-box">
+            <span>Total Messages</span>
+            <strong id="statTotalFeedback">0</strong>
+        </div>
+        <div class="stat-box">
+            <span>Today's Inquiries</span>
+            <strong id="statTodayFeedback" style="color:#4ade80;">0</strong>
+        </div>
+        <div class="stat-box">
+            <span>Unique Customers</span>
+            <strong id="statUniqueCustomers">0</strong>
+        </div>
+    </div>
+
+
+    <!-- SEARCH & CONTROLS -->
+    <div class="admin-controls-bar">
+        <div class="search-box">
+            <input type="text" id="feedbackSearch" placeholder="🔍 Search customer name, email, or message..." oninput="handleSearch()">
+        </div>
+
+        <button class="primary-btn" onclick="loadAdminFeedback()" style="display:flex;align-items:center;gap:6px;">
+            🔄 Refresh Inbox
+        </button>
+    </div>
+
+
+    <!-- FEEDBACK CARDS GRID -->
+    <div id="adminFeedbackContainer" class="menu-grid" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:25px;">
+        <p style="text-align:center;grid-column:1/-1;">Loading customer feedback from MongoDB Atlas...</p>
+    </div>
+
+</section>
+
+<!-- TOAST -->
+<div id="adminToast" class="admin-toast"></div>
+
+
+<script>
+// Authentication Check
+const adminLoggedIn = localStorage.getItem("adminLoggedIn") === "true" || sessionStorage.getItem("adminLoggedIn") === "true";
+if (!adminLoggedIn) {
+    window.location.href = "admin-login.html";
+}
+
+function logout() {
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminUser");
+    sessionStorage.removeItem("adminLoggedIn");
+    sessionStorage.removeItem("adminUser");
+    window.location.href = "admin-login.html";
+}
+
+// Universal API caller for feedback
+async function fetchFeedbackApi(endpoint, options = {}) {
+    const urls = [];
+    if (window.location.protocol.startsWith("http")) {
+        if (window.location.port === "5000" || window.location.port === "") {
+            urls.push(endpoint);
+        }
+        const host = window.location.hostname || "localhost";
+        urls.push(`http://${host}:5000${endpoint}`);
+        if (host !== "localhost") urls.push(`http://localhost:5000${endpoint}`);
+        if (host !== "127.0.0.1") urls.push(`http://127.0.0.1:5000${endpoint}`);
+    } else {
+        urls.push(`http://localhost:5000${endpoint}`);
+        urls.push(`http://127.0.0.1:5000${endpoint}`);
+    }
+
+    let lastError = null;
+    for (const u of urls) {
+        try {
+            const res = await fetch(u, options);
+            if (res.ok || res.status < 500) {
+                return res;
+            }
+        } catch (err) {
+            lastError = err;
+        }
+    }
+    throw lastError || new Error("Failed to connect to backend on port 5000");
+}
+
+let allFeedback = [];
+
+function showToast(msg, isError = false) {
+    const toast = document.getElementById("adminToast");
+    toast.textContent = msg;
+    toast.className = "admin-toast " + (isError ? "toast-error" : "toast-success");
+    toast.style.display = "block";
+    setTimeout(() => { toast.style.display = "none"; }, 3500);
+}
+
+// ==========================================
+// LOAD ALL FEEDBACK
+// ==========================================
+async function loadAdminFeedback() {
+    const container = document.getElementById("adminFeedbackContainer");
+
+    try {
+        const response = await fetchFeedbackApi("/api/feedback");
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+
+        allFeedback = await response.json();
+        if (Array.isArray(allFeedback) && allFeedback.length > 0) {
+            localStorage.setItem("cached_admin_feedback", JSON.stringify(allFeedback));
+        }
+        updateStats();
+        renderFeedback();
+
+    } catch (error) {
+        console.warn("Load feedback error, checking cached feedback:", error);
+        const cached = localStorage.getItem("cached_admin_feedback");
+        if (cached) {
+            try {
+                allFeedback = JSON.parse(cached);
+                updateStats();
+                renderFeedback();
+                showToast("⚡ Showing cached feedback. (Reconnecting with backend...)", true);
+                return;
+            } catch (e) {}
+        }
+
+        container.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:30px;background:rgba(239,68,68,0.1);border-radius:12px;border:1px solid #ef4444;">
+                <p style="color:#f87171;font-weight:600;">⚠️ Could not load feedback messages from database.</p>
+                <p style="font-size:0.85rem;color:#ccc;margin-top:6px;">Make sure your backend server is running on http://localhost:5000.</p>
+                <button class="primary-btn" style="margin-top:10px;" onclick="loadAdminFeedback()">Retry Connection</button>
+            </div>
+        `;
+    }
+}
+
+// ==========================================
+// UPDATE STATISTICS
+// ==========================================
+function updateStats() {
+    const total = allFeedback.length;
+    document.getElementById("statTotalFeedback").textContent = total;
+
+    // Check today's messages
+    const today = new Date().toISOString().slice(0, 10);
+    const todayCount = allFeedback.filter(f => f.created_at && f.created_at.slice(0, 10) === today).length;
+    document.getElementById("statTodayFeedback").textContent = todayCount;
+
+    // Unique customer emails
+    const uniqueEmails = new Set(allFeedback.map(f => (f.email || "").toLowerCase())).size;
+    document.getElementById("statUniqueCustomers").textContent = uniqueEmails;
+}
+
+// ==========================================
+// RENDER FEEDBACK CARDS
+// ==========================================
+function renderFeedback() {
+    const container = document.getElementById("adminFeedbackContainer");
+    const searchTerm = (document.getElementById("feedbackSearch").value || "").toLowerCase().trim();
+
+    const filtered = allFeedback.filter(f => {
+        const nameMatch = (f.name || "").toLowerCase().includes(searchTerm);
+        const emailMatch = (f.email || "").toLowerCase().includes(searchTerm);
+        const msgMatch = (f.message || "").toLowerCase().includes(searchTerm);
+        return nameMatch || emailMatch || msgMatch;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;">
+                <p style="font-size:1.1rem;">No feedback messages found.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = "";
+
+    filtered.forEach(f => {
+        const card = document.createElement("div");
+        card.className = "feedback-card";
+
+        const initials = (f.name || "C").charAt(0).toUpperCase();
+        const dateStr = f.created_at ? new Date(f.created_at).toLocaleString("en-IN", {
+            day: 'numeric', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        }) : "Recent";
+
+        const mailtoLink = `mailto:${encodeURIComponent(f.email)}?subject=${encodeURIComponent("Regarding your feedback at Hotel Vahinisaheb")}&body=${encodeURIComponent("Dear " + f.name + ",\n\nThank you for reaching out to Hotel Vahinisaheb.\n\nRegarding your note: \"" + f.message + "\"\n\nWarm regards,\nHotel Vahinisaheb Team")}`;
+
+        card.innerHTML = `
+            <div>
+                <div class="feedback-top-row">
+                    <div class="feedback-user-info">
+                        <div class="feedback-avatar">${initials}</div>
+                        <div class="feedback-user-meta">
+                            <h4>${escapeHTML(f.name)}</h4>
+                            <a href="mailto:${escapeHTML(f.email)}">✉️ ${escapeHTML(f.email)}</a>
+                        </div>
+                    </div>
+
+                    <span class="feedback-date">
+                        ${dateStr}
+                    </span>
+                </div>
+
+                <div class="feedback-message-body">
+                    "${escapeHTML(f.message)}"
+                </div>
+            </div>
+
+            <div class="feedback-actions-row">
+                <a href="${mailtoLink}" class="btn-reply">
+                    ✉️ Reply via Email
+                </a>
+
+                <button class="btn-dismiss" onclick="deleteFeedbackItem('${f.id}', '${escapeHTML(f.name)}')">
+                    🗑️ Delete
+                </button>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function handleSearch() {
+    renderFeedback();
+}
+
+// ==========================================
+// DELETE FEEDBACK ITEM
+// ==========================================
+async function deleteFeedbackItem(id, customerName) {
+    const confirmed = confirm(`Are you sure you want to permanently delete feedback message from "${customerName}"?`);
+    if (!confirmed) return;
+
+    try {
+        const response = await fetchFeedbackApi(`/api/feedback/${id}`, {
+            method: "DELETE"
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Failed to delete feedback");
+
+        showToast(`🗑️ Feedback message deleted.`);
+        loadAdminFeedback();
+
+    } catch (error) {
+        console.error("Delete feedback error:", error);
+        showToast(error.message, true);
+    }
+}
+
+function escapeHTML(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function logout() {
+    sessionStorage.removeItem("adminLoggedIn");
+    window.location.href = "admin-login.html";
+}
+
+loadAdminFeedback();
+</script>
+
+</body>
+</html>

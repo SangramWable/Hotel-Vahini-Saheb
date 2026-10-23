@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Hotel Vahinisaheb</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ========================================================
+           ROYAL ADMIN DASHBOARD LUXURY STYLES
+        ======================================================== */
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f7e7b4;
+            --gold-glow: rgba(212, 175, 55, 0.35);
+            --bg-card: rgba(26, 17, 11, 0.7);
+            --border-gold: rgba(212, 175, 55, 0.25);
+        }
+
+        body {
+            background: #0d0805;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(120, 53, 15, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 45%);
+            min-height: 100vh;
+            color: #f3f0e6;
+        }
+
+        /* Navbar enhancements */
+        .admin-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill-btn {
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #f7e7b4;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-pill-btn:hover {
+            background: #d4af37;
+            color: #120b06;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        .nav-logout-btn {
+            padding: 9px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-logout-btn:hover {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Welcome Banner */
+        .dashboard-hero-banner {
+            max-width: 1150px;
+            margin: 15px auto 35px;
+            padding: 35px 40px;
+            background: linear-gradient(135deg, rgba(45, 24, 13, 0.9), rgba(18, 11, 7, 0.95));
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .dashboard-hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-banner-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 20px;
+            color: #d4af37;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            color: #fff;
+            margin: 0 0 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #fce9b8, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            color: #c4b9a8;
+            font-size: 0.95rem;
+            margin: 0;
+            max-width: 580px;
+            line-height: 1.5;
+        }
+
+        .hero-status-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .live-clock-badge {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #d4af37;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .db-status-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #4ade80;
+            background: rgba(34, 197, 94, 0.15);
+            padding: 5px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* KPI Metric Cards Grid */
+        .kpi-metrics-grid {
+            max-width: 1150px;
+            margin: 0 auto 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2);
+        }
+
+        .kpi-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .kpi-icon-bubble {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .kpi-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #d4af37;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 6px;
+        }
+
+        .kpi-number {
+            font-family: 'Cinzel', serif;
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 8px;
+            line-height: 1;
+        }
+
+        .kpi-subtext {
+            font-size: 0.75rem;
+            color: #888;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 3 Main Management Feature Cards */
+        .management-hub-section {
+            max-width: 1150px;
+            margin: 0 auto 45px;
+        }
+
+        .section-header-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 14px;
+        }
+
+        .section-header-compact h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .section-header-compact p {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin: 4px 0 0;
+        }
+
+        .hub-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .hub-card {
+            background: linear-gradient(145deg, rgba(30, 20, 13, 0.85), rgba(16, 10, 6, 0.95));
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 22px;
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .hub-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #d4af37, #78350f);
+            opacity: 0.8;
+        }
+
+        .hub-card:hover {
+            transform: translateY(-6px);
+            border-color: #d4af37;
+            box-shadow: 0 20px 45px rgba(212, 175, 55, 0.25);
+        }
+
+        .hub-card-icon-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .hub-icon-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .hub-badge-counter {
+            background: rgba(212, 175, 55, 0.18);
+            border: 1px solid #d4af37;
+            color: #f7e7b4;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .hub-card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.35rem;
+            color: #fff;
+            margin: 0 0 10px;
+        }
+
+        .hub-card-desc {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .hub-features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .hub-features-list li {
+            font-size: 0.82rem;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hub-features-list li::before {
+            content: '✦';
+            color: #d4af37;
+            font-size: 0.75rem;
+        }
+
+        .hub-cta-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #d4af37, #9b722b);
+            color: #120b06;
+            font-weight: 800;
+            font-size: 0.92rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25);
+        }
+
+        .hub-cta-btn:hover {
+            background: linear-gradient(135deg, #f3d87e, #b88b35);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Live Activity Snippet Cards */
+        .activity-preview-grid {
+            max-width: 1150px;
+            margin: 0 auto 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .activity-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .activity-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .activity-panel-header h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: #f7e7b4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-view-all {
+            font-size: 0.8rem;
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .activity-view-all:hover {
+            text-decoration: underline;
+        }
+
+        .snippet-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .snippet-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .snippet-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .snippet-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .snippet-rating {
+            color: #f59e0b;
+            font-size: 0.85rem;
+        }
+
+        .snippet-text {
+            font-size: 0.82rem;
+            color: #aaa;
+            line-height: 1.4;
+            font-style: italic;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Dashboard Content Tabs */
+        .dashboard-tabs-bar {
+            max-width: 1150px;
+            margin: 0 auto 30px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+            padding-bottom: 16px;
+        }
+
+        .dash-tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 25px;
+            padding: 10px 22px;
+            color: #ccc;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-tab-btn:hover {
+            color: #f7e7b4;
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .dash-tab-btn.active {
+            background: #d4af37;
+            color: #120b06;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+        }
+
+        /* Showcase Sections */
+        .dashboard-section-block {
+            max-width: 1150px;
+            margin: 0 auto 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+        }
+
+        .dashboard-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .dashboard-section-header h3 {
+            font-family: 'Cinzel', serif;
+            color: #fff;
+            margin: 0;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-section-header h3 span {
+            color: #d4af37;
+        }
+
+        /* Menu Dishes Grid on Dashboard */
+        .dash-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .dash-dish-card {
+            background: linear-gradient(145deg, rgba(32, 20, 12, 0.8), rgba(18, 11, 7, 0.95));
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .dash-dish-card:hover {
+            transform: translateY(-3px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+        }
+
+        .dash-dish-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .dash-dish-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            flex-shrink: 0;
+        }
+
+        .dash-dish-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dash-dish-info h4 {
+            margin: 0 0 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .dash-dish-info .dash-dish-price {
+            font-weight: 800;
+            color: #d4af37;
+            font-size: 0.92rem;
+        }
+
+        .dash-dish-desc {
+            font-size: 0.78rem;
+            color: #888;
+            line-height: 1.5;
+            margin: 0 0 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .dash-dish-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 10px;
+        }
+
+        .dash-tag {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .dash-tag-veg { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .dash-tag-nonveg { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .dash-tag-breads { background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .dash-tag-drinks { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        /* Reviews List on Dashboard */
+        .dash-reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .dash-review-card {
+            background: rgba(18, 11, 7, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            transition: all 0.2s;
+        }
+
+        .dash-review-card:hover {
+            border-color: #d4af37;
+            background: rgba(24, 14, 9, 0.85);
+        }
+
+        .dash-review-main {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .dash-review-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .dash-review-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .dash-review-stars {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        .dash-review-text {
+            color: #ccc;
+            font-size: 0.86rem;
+            margin: 0;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .dash-review-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-pill-approved {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+            border: 1px solid #22c55e;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-pill-cancelled {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-dash-action {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            color: #f7e7b4;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-dash-action:hover {
+            background: #d4af37;
+            color: #120b06;
+        }
+
+        /* Feedback List on Dashboard */
+        .dash-feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .dash-feedback-card {
+            background: rgba(18, 11, 7, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .dash-feedback-card:hover {
+            border-color: #d4af37;
+            background: rgba(24, 14, 9, 0.85);
+        }
+
+        .dash-feedback-main {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .dash-feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .dash-feedback-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .dash-feedback-email {
+            font-size: 0.8rem;
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        .dash-feedback-date {
+            font-size: 0.72rem;
+            color: #888;
+            margin-left: auto;
+        }
+
+        .dash-feedback-text {
+            color: #ccc;
+            font-size: 0.86rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .hero-status-pills {
+                align-items: flex-start;
+            }
+            .hero-title {
+                font-size: 1.7rem;
+            }
+            .dashboard-hero-banner {
+                padding: 25px;
+            }
+            .dash-review-card, .dash-feedback-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <nav class="navbar">
+        <a href="admin-dashboard.html" class="brand">
+            <img src="./logo.jpeg" alt="Hotel Vahinisaheb">
+            <div class="brand-text">
+                <h3>Hotel Vahinisaheb</h3>
+                <p>Owner Dashboard</p>
+            </div>
+        </a>
+
+        <!-- CLEAN & ACCURATE TOP NAVIGATION (Menu, Reviews, Feedback moved to page hub cards) -->
+        <div class="admin-nav-actions">
+            <a href="menu.html" target="_blank" class="nav-pill-btn">
+                🌐 Live Menu
+            </a>
+            <a href="reviews.html" target="_blank" class="nav-pill-btn">
+                ⭐ Live Reviews
+            </a>
+            <a href="contact.html" target="_blank" class="nav-pill-btn">
+                📞 Contact
+            </a>
+            <button class="nav-logout-btn" onclick="logout()">
+                🚪 Logout
+            </button>
+        </div>
+    </nav>
+</header>
+
+
+<main style="padding: 105px 20px 40px;">
+
+    <!-- ========================================================
+         HERO WELCOME BANNER
+    ======================================================== -->
+    <div class="dashboard-hero-banner">
+        <div class="hero-banner-content">
+            <div>
+                <div class="hero-welcome-badge">
+                    <span id="adminBadgeName">👑 Master Administrator</span>
+                </div>
+                <h1 class="hero-title">
+                    Welcome to <span>Hotel Vahinisaheb</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Control menu dishes, monitor live customer reviews, and respond to dining inquiries with real-time MongoDB Atlas database sync.
+                </p>
+            </div>
+
+            <div class="hero-status-pills">
+                <div class="live-clock-badge" id="liveClock">
+                    🕐 Loading time...
+                </div>
+                <div class="db-status-badge">
+                    <span class="pulse-dot"></span>
+                    <span>MongoDB Atlas Online (Port 5000)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         KEY METRICS STATS (KPIs)
+    ======================================================== -->
+    <div class="kpi-metrics-grid">
+        <!-- 1. Menu Items -->
+        <div class="kpi-card">
+            <div class="kpi-top-row">
+                <div class="kpi-icon-bubble">🍛</div>
+                <span class="kpi-tag">Database</span>
+            </div>
+            <p class="kpi-label">Active Dishes</p>
+            <div class="kpi-number" id="menuCount">--</div>
+            <p class="kpi-subtext">Veg, Non-Veg & Special Delicacies</p>
+        </div>
+
+        <!-- 2. Reviews -->
+        <div class="kpi-card">
+            <div class="kpi-top-row">
+                <div class="kpi-icon-bubble">⭐</div>
+                <span class="kpi-tag" id="kpiReviewBadge">Verified</span>
+            </div>
+            <p class="kpi-label">Customer Reviews</p>
+            <div class="kpi-number" id="reviewCount">--</div>
+            <p class="kpi-subtext" id="kpiApprovedText">Approved & Visible to Diners</p>
+        </div>
+
+        <!-- 3. Feedback -->
+        <div class="kpi-card">
+            <div class="kpi-top-row">
+                <div class="kpi-icon-bubble">💬</div>
+                <span class="kpi-tag">Inbox</span>
+            </div>
+            <p class="kpi-label">Guest Feedback</p>
+            <div class="kpi-number" id="feedbackCount">--</div>
+            <p class="kpi-subtext">Direct inquiries & suggestions</p>
+        </div>
+
+        <!-- 4. Average Rating -->
+        <div class="kpi-card">
+            <div class="kpi-top-row">
+                <div class="kpi-icon-bubble">🏆</div>
+                <span class="kpi-tag" style="color:#4ade80;">Quality</span>
+            </div>
+            <p class="kpi-label">Average Rating</p>
+            <div class="kpi-number" id="averageRating" style="color:#d4af37;">--</div>
+            <p class="kpi-subtext">Overall guest dining score</p>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         THE 3 MAIN MANAGEMENT MODULES
+    ======================================================== -->
+    <div class="management-hub-section">
+        <div class="section-header-compact">
+            <div>
+                <h3>Administrative Management Center</h3>
+                <p>Choose an action to modify your restaurant data directly</p>
+            </div>
+            <button class="nav-pill-btn" onclick="loadDashboardStats()" style="font-size:0.8rem;padding:6px 14px;">
+                🔄 Refresh Stats
+            </button>
+        </div>
+
+        <div class="hub-cards-grid">
+            <!-- 1. Menu Management -->
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-icon-header">
+                        <div class="hub-icon-large">🍛</div>
+                        <span class="hub-badge-counter" id="menuBadgeCounter">Loading...</span>
+                    </div>
+
+                    <h4 class="hub-card-title">Menu Management</h4>
+                    <p class="hub-card-desc">
+                        Add mouthwatering dishes, update prices with one click, upload high-definition food photos, and set Chef's Special badges.
+                    </p>
+
+                    <ul class="hub-features-list">
+                        <li>Instant live update across all devices</li>
+                        <li>Edit prices & dish descriptions in popup modal</li>
+                        <li>High-res photo upload with live preview</li>
+                        <li>Categorize Veg, Non-Veg, Breads & Drinks</li>
+                    </ul>
+                </div>
+
+                <a href="admin-menu.html" class="hub-cta-btn">
+                    <span>Manage Menu Dishes</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- 2. Review Moderation -->
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-icon-header">
+                        <div class="hub-icon-large">⭐</div>
+                        <span class="hub-badge-counter" id="reviewBadgeCounter" style="border-color:#4ade80;color:#4ade80;">Active</span>
+                    </div>
+
+                    <h4 class="hub-card-title">Review Management</h4>
+                    <p class="hub-card-desc">
+                        Moderate customer reviews stored in MongoDB Atlas. Approve positive reviews to make them live or hide inappropriate feedback.
+                    </p>
+
+                    <ul class="hub-features-list">
+                        <li>1-Click Approve / Cancel (Hide) toggle</li>
+                        <li>Cancelled reviews are hidden from public website</li>
+                        <li>Edit or delete customer reviews permanently</li>
+                        <li>Manually insert offline customer reviews</li>
+                    </ul>
+                </div>
+
+                <a href="admin-review.html" class="hub-cta-btn">
+                    <span>Moderate Reviews</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- 3. Feedback Management -->
+            <div class="hub-card">
+                <div>
+                    <div class="hub-card-icon-header">
+                        <div class="hub-icon-large">💬</div>
+                        <span class="hub-badge-counter" id="feedbackBadgeCounter" style="border-color:#38bdf8;color:#38bdf8;">Messages</span>
+                    </div>
+
+                    <h4 class="hub-card-title">Feedback & Inquiries</h4>
+                    <p class="hub-card-desc">
+                        Read guest suggestions, complaints, and banquet catering inquiries submitted through the contact page.
+                    </p>
+
+                    <ul class="hub-features-list">
+                        <li>Direct 1-Click email response with customer quote</li>
+                        <li>View guest email and inquiry timestamps</li>
+                        <li>Search feedback by name or message</li>
+                        <li>Dismiss or permanently delete inquiries</li>
+                    </ul>
+                </div>
+
+                <a href="admin-feedback.html" class="hub-cta-btn">
+                    <span>Open Feedback Inbox</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         QUICK FILTER TABS FOR DIRECT IN-DASHBOARD MANAGEMENT
+    ======================================================== -->
+    <div class="dashboard-tabs-bar" id="dashTabsBar">
+        <button class="dash-tab-btn active" onclick="switchDashTab('all', this)">✨ All Overview</button>
+        <button class="dash-tab-btn" onclick="switchDashTab('menu', this)">🍲 Existing Menu Dishes (<span id="tabMenuCount">...</span>)</button>
+        <button class="dash-tab-btn" onclick="switchDashTab('reviews', this)">⭐ Existing Reviews (<span id="tabReviewsCount">...</span>)</button>
+        <button class="dash-tab-btn" onclick="switchDashTab('feedback', this)">💬 Existing Feedback (<span id="tabFeedbackCount">...</span>)</button>
+    </div>
+
+    <!-- ========================================================
+         SECTION 1: EXISTING MENU DISHES DIRECT SHOWCASE
+    ======================================================== -->
+    <div class="dashboard-section-block" id="dashMenuSection">
+        <div class="dashboard-section-header">
+            <h3>🍲 <span>Live Hotel Menu Dishes</span></h3>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <span id="dashMenuTotalBadge" style="font-size:0.85rem;color:#f39c12;font-weight:700;">Loading...</span>
+                <a href="admin-menu.html" class="btn-dash-action" style="padding:8px 16px;">+ Add / Manage Dishes →</a>
+            </div>
+        </div>
+        <div id="dashMenuGrid" class="dash-menu-grid">
+            <p style="color:#777;grid-column:1/-1;text-align:center;padding:30px;">Loading existing menu items...</p>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2: EXISTING REVIEWS SHOWCASE & MODERATION
+    ======================================================== -->
+    <div class="dashboard-section-block" id="dashReviewsSection">
+        <div class="dashboard-section-header">
+            <h3>⭐ <span>Existing Guest Reviews</span></h3>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <span id="dashReviewsTotalBadge" style="font-size:0.85rem;color:#f39c12;font-weight:700;">Loading...</span>
+                <a href="admin-review.html" class="btn-dash-action" style="padding:8px 16px;">Open Full Reviews Manager →</a>
+            </div>
+        </div>
+        <div id="dashReviewsList" class="dash-reviews-list">
+            <p style="color:#777;text-align:center;padding:30px;">Loading existing reviews...</p>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 3: EXISTING GUEST FEEDBACK / INQUIRIES SHOWCASE
+    ======================================================== -->
+    <div class="dashboard-section-block" id="dashFeedbackSection">
+        <div class="dashboard-section-header">
+            <h3>💬 <span>Existing Guest Inquiries & Feedback</span></h3>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                <span id="dashFeedbackTotalBadge" style="font-size:0.85rem;color:#f39c12;font-weight:700;">Loading...</span>
+                <a href="admin-feedback.html" class="btn-dash-action" style="padding:8px 16px;">Open Feedback Inbox →</a>
+            </div>
+        </div>
+        <div id="dashFeedbackList" class="dash-feedback-list">
+            <p style="color:#777;text-align:center;padding:30px;">Loading existing feedback...</p>
+        </div>
+    </div>
+
+</main>
+
+
+<script>
+// ==========================================
+// ADMIN AUTHENTICATION
+// ==========================================
+const adminLoggedIn = localStorage.getItem("adminLoggedIn") === "true" || sessionStorage.getItem("adminLoggedIn") === "true";
+if (!adminLoggedIn) {
+    window.location.href = "admin-login.html";
+} else {
+    const adminUser = localStorage.getItem("adminUser") || sessionStorage.getItem("adminUser");
+    if (adminUser) {
+        const badge = document.getElementById("adminBadgeName");
+        if (badge) badge.textContent = `👑 Master Administrator (${adminUser})`;
+    }
+}
+
+function logout() {
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("adminUser");
+    sessionStorage.removeItem("adminLoggedIn");
+    sessionStorage.removeItem("adminUser");
+    window.location.href = "admin-login.html";
+}
+
+// ==========================================
+// LIVE CLOCK DISPLAY
+// ==========================================
+function updateClock() {
+    const clockEl = document.getElementById("liveClock");
+    if (!clockEl) return;
+    const now = new Date();
+    clockEl.textContent = "🕐 " + now.toLocaleDateString("en-IN", { 
+        weekday: 'short', day: 'numeric', month: 'short' 
+    }) + " • " + now.toLocaleTimeString("en-IN", { 
+        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ==========================================
+// UNIVERSAL RESILIENT API CALLER
+// ==========================================
+async function fetchAdminApi(endpoint, options = {}) {
+    const urls = [];
+    if (window.location.protocol.startsWith("http")) {
+        if (window.location.port === "5000" || window.location.port === "") urls.push(endpoint);
+        const host = window.location.hostname || "localhost";
+        urls.push(`http://${host}:5000${endpoint}`);
+        if (host !== "localhost") urls.push(`http://localhost:5000${endpoint}`);
+        if (host !== "127.0.0.1") urls.push(`http://127.0.0.1:5000${endpoint}`);
+    } else {
+        urls.push(`http://localhost:5000${endpoint}`);
+        urls.push(`http://127.0.0.1:5000${endpoint}`);
+    }
+
+    let lastError = null;
+    for (const u of urls) {
+        try {
+            const res = await fetch(u, options);
+            if (res.ok || res.status < 500) return res;
+        } catch (e) {
+            lastError = e;
+        }
+    }
+    throw lastError || new Error("Unable to connect to backend on port 5000");
+}
+
+// ==========================================
+// TAB SWITCHER
+// ==========================================
+function switchDashTab(tab, btn) {
+    document.querySelectorAll(".dash-tab-btn").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+
+    const menuSec = document.getElementById("dashMenuSection");
+    const revSec = document.getElementById("dashReviewsSection");
+    const fbSec = document.getElementById("dashFeedbackSection");
+
+    if (tab === 'all') {
+        if (menuSec) menuSec.style.display = "block";
+        if (revSec) revSec.style.display = "block";
+        if (fbSec) fbSec.style.display = "block";
+    } else if (tab === 'menu') {
+        if (menuSec) menuSec.style.display = "block";
+        if (revSec) revSec.style.display = "none";
+        if (fbSec) fbSec.style.display = "none";
+    } else if (tab === 'reviews') {
+        if (menuSec) menuSec.style.display = "none";
+        if (revSec) revSec.style.display = "block";
+        if (fbSec) fbSec.style.display = "none";
+    } else if (tab === 'feedback') {
+        if (menuSec) menuSec.style.display = "none";
+        if (revSec) revSec.style.display = "none";
+        if (fbSec) fbSec.style.display = "block";
+    }
+}
+
+// ==========================================
+// RENDER EXISTING DISHES
+// ==========================================
+function renderDashboardMenu(menu) {
+    const grid = document.getElementById("dashMenuGrid");
+    const badge = document.getElementById("dashMenuTotalBadge");
+    const tabCount = document.getElementById("tabMenuCount");
+    const kpiCount = document.getElementById("menuCount");
+    const kpiBadge = document.getElementById("menuBadgeCounter");
+
+    if (badge) badge.textContent = `${menu.length} Total Registered Dishes`;
+    if (tabCount) tabCount.textContent = menu.length;
+    if (kpiCount) kpiCount.textContent = menu.length;
+    if (kpiBadge) kpiBadge.textContent = `${menu.length} Dishes`;
+
+    if (!grid) return;
+    if (menu.length === 0) {
+        grid.innerHTML = `<p style="color:#777;grid-column:1/-1;text-align:center;padding:30px;">No dishes registered in menu yet.</p>`;
+        return;
+    }
+
+    grid.innerHTML = "";
+    menu.forEach(dish => {
+        const card = document.createElement("div");
+        card.className = "dash-dish-card";
+
+        const cat = (dish.category || "veg").toLowerCase();
+        let catClass = "dash-tag-veg";
+        let defaultEmoji = "🥗";
+        if (cat.includes("non") || cat === "non-veg") { catClass = "dash-tag-nonveg"; defaultEmoji = "🍗"; }
+        else if (cat.includes("bread") || cat.includes("roti")) { catClass = "dash-tag-breads"; defaultEmoji = "🫓"; }
+        else if (cat.includes("drink") || cat.includes("beverage")) { catClass = "dash-tag-drinks"; defaultEmoji = "🥤"; }
+
+        const thumbContent = dish.image 
+            ? `<img src="${dish.image}" alt="${escapeHTML(dish.name)}" onerror="this.onerror=null;this.parentElement.innerHTML='${defaultEmoji}';">`
+            : defaultEmoji;
+
+        card.innerHTML = `
+            <div>
+                <div class="dash-dish-top">
+                    <div class="dash-dish-thumb">${thumbContent}</div>
+                    <div class="dash-dish-info">
+                        <h4>${escapeHTML(dish.name)}</h4>
+                        <div class="dash-dish-price">₹${Number(dish.price).toFixed(2)}</div>
+                    </div>
+                </div>
+                <p class="dash-dish-desc">${dish.description ? escapeHTML(dish.description) : 'Authentic Maharashtrian specialty prepared with royal spices.'}</p>
+            </div>
+            <div class="dash-dish-footer">
+                <span class="dash-tag ${catClass}">${escapeHTML(dish.category || 'Special')}</span>
+                <a href="admin-menu.html" class="btn-dash-action" style="font-size:0.75rem;padding:4px 10px;">Edit Dish</a>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// ==========================================
+// RENDER EXISTING REVIEWS
+// ==========================================
+function renderDashboardReviews(reviews) {
+    const list = document.getElementById("dashReviewsList");
+    const badge = document.getElementById("dashReviewsTotalBadge");
+    const tabCount = document.getElementById("tabReviewsCount");
+    const kpiCount = document.getElementById("reviewCount");
+    const kpiApprovedText = document.getElementById("kpiApprovedText");
+    const kpiBadgeCounter = document.getElementById("reviewBadgeCounter");
+    const avgRatingEl = document.getElementById("averageRating");
+
+    const approvedCount = reviews.filter(r => (r.status || 'approved') === 'approved').length;
+
+    if (badge) badge.textContent = `${reviews.length} Reviews (${approvedCount} Live & Approved)`;
+    if (tabCount) tabCount.textContent = reviews.length;
+    if (kpiCount) kpiCount.textContent = reviews.length;
+    if (kpiApprovedText) kpiApprovedText.textContent = `${approvedCount} Approved & Live`;
+    if (kpiBadgeCounter) kpiBadgeCounter.textContent = `${approvedCount} Live`;
+
+    if (reviews.length > 0 && avgRatingEl) {
+        const totalRating = reviews.reduce((sum, r) => sum + Number(r.rating || 5), 0);
+        const avg = (totalRating / reviews.length).toFixed(1);
+        avgRatingEl.textContent = avg + " ★";
+    }
+
+    if (!list) return;
+    if (reviews.length === 0) {
+        list.innerHTML = `<p style="color:#777;text-align:center;padding:30px;">No reviews registered yet.</p>`;
+        return;
+    }
+
+    list.innerHTML = "";
+    reviews.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "dash-review-card";
+
+        const ratingNum = Math.max(1, Math.min(5, Number(r.rating) || 5));
+        const stars = "★".repeat(ratingNum) + "☆".repeat(5 - ratingNum);
+        const isApproved = (r.status || 'approved') === 'approved';
+
+        const statusPill = isApproved 
+            ? `<span class="status-pill-approved">● Live on Website</span>` 
+            : `<span class="status-pill-cancelled">● Hidden / Cancelled</span>`;
+
+        const nextActionStatus = isApproved ? 'cancelled' : 'approved';
+        const nextActionLabel = isApproved ? '🚫 Cancel/Hide' : '✓ Approve & Show';
+
+        card.innerHTML = `
+            <div class="dash-review-main">
+                <div class="dash-review-header">
+                    <span class="dash-review-name">${escapeHTML(r.name)}</span>
+                    <span class="dash-review-stars">${stars}</span>
+                    ${statusPill}
+                </div>
+                <p class="dash-review-text">"${escapeHTML(r.message)}"</p>
+            </div>
+            <div class="dash-review-actions">
+                <button class="btn-dash-action" onclick="toggleReviewStatusDashboard('${r.id}', '${nextActionStatus}')">
+                    ${nextActionLabel}
+                </button>
+                <a href="admin-review.html" class="btn-dash-action" style="font-size:0.75rem;">Manage</a>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+// 1-Click Moderation directly on dashboard
+async function toggleReviewStatusDashboard(id, newStatus) {
+    try {
+        const res = await fetchAdminApi(`/api/reviews/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+            await loadDashboardStats();
+        } else {
+            alert("Could not update review status");
+        }
+    } catch (e) {
+        console.error("Status toggle error:", e);
+        alert("Failed to connect to server: " + e.message);
+    }
+}
+
+// ==========================================
+// RENDER EXISTING FEEDBACK
+// ==========================================
+function renderDashboardFeedback(feedback) {
+    const list = document.getElementById("dashFeedbackList");
+    const badge = document.getElementById("dashFeedbackTotalBadge");
+    const tabCount = document.getElementById("tabFeedbackCount");
+    const kpiCount = document.getElementById("feedbackCount");
+    const kpiBadge = document.getElementById("feedbackBadgeCounter");
+
+    if (badge) badge.textContent = `${feedback.length} Customer Inquiries`;
+    if (tabCount) tabCount.textContent = feedback.length;
+    if (kpiCount) kpiCount.textContent = feedback.length;
+    if (kpiBadge) kpiBadge.textContent = `${feedback.length} Messages`;
+
+    if (!list) return;
+    if (feedback.length === 0) {
+        list.innerHTML = `<p style="color:#777;text-align:center;padding:30px;">No feedback messages received yet.</p>`;
+        return;
+    }
+
+    list.innerHTML = "";
+    feedback.forEach(f => {
+        const card = document.createElement("div");
+        card.className = "dash-feedback-card";
+
+        const dateStr = f.created_at 
+            ? new Date(f.created_at).toLocaleDateString("en-IN", { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) 
+            : "Recent Inquiry";
+
+        card.innerHTML = `
+            <div class="dash-feedback-main">
+                <div class="dash-feedback-header">
+                    <span class="dash-feedback-name">${escapeHTML(f.name)}</span>
+                    <a href="mailto:${escapeHTML(f.email)}" class="dash-feedback-email">✉️ ${escapeHTML(f.email)}</a>
+                    <span class="dash-feedback-date">${dateStr}</span>
+                </div>
+                <p class="dash-feedback-text">"${escapeHTML(f.message)}"</p>
+            </div>
+            <div>
+                <a href="mailto:${escapeHTML(f.email)}?subject=Regarding your inquiry at Hotel Vahinisaheb" class="btn-dash-action">
+                    ✉️ Reply by Email
+                </a>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+// ==========================================
+// LOAD DASHBOARD DATA (WITH INSTANT CACHE FALLBACK)
+// ==========================================
+async function loadDashboardStats() {
+    // 1. Instant cache render so page is NEVER blank
+    try {
+        const cachedMenu = JSON.parse(localStorage.getItem("cached_admin_menu") || "null");
+        if (cachedMenu && Array.isArray(cachedMenu)) renderDashboardMenu(cachedMenu);
+
+        const cachedReviews = JSON.parse(localStorage.getItem("cached_admin_reviews") || "null");
+        if (cachedReviews && Array.isArray(cachedReviews)) renderDashboardReviews(cachedReviews);
+
+        const cachedFeedback = JSON.parse(localStorage.getItem("cached_admin_feedback") || "null");
+        if (cachedFeedback && Array.isArray(cachedFeedback)) renderDashboardFeedback(cachedFeedback);
+    } catch (e) {
+        console.warn("Cache parse error:", e);
+    }
+
+    // 2. Fetch fresh data from backend
+    try {
+        // Fetch Menu
+        const menuRes = await fetchAdminApi("/api/menu");
+        if (menuRes.ok) {
+            const menu = await menuRes.json();
+            // 1. Render immediately from live database
+            renderDashboardMenu(menu);
+
+            // 2. Safely update cache without huge base64 strings
+            try {
+                const lightweight = menu.map(m => ({
+                    id: m.id || m._id,
+                    _id: m._id || m.id,
+                    name: m.name,
+                    category: m.category,
+                    price: m.price,
+                    badge: m.badge,
+                    description: m.description,
+                    image: (m.image && m.image.length > 300 && m.image.startsWith("data:")) ? "" : m.image
+                }));
+                localStorage.setItem("cached_admin_menu", JSON.stringify(lightweight));
+            } catch (ce) {
+                console.warn("Menu cache quota:", ce);
+            }
+        }
+    } catch (err) {
+        console.error("Menu fetch error:", err);
+    }
+
+    try {
+        // Fetch Reviews (admin=true gets both approved and cancelled)
+        const revRes = await fetchAdminApi("/api/reviews?admin=true");
+        if (revRes.ok) {
+            const reviews = await revRes.json();
+            renderDashboardReviews(reviews);
+            try {
+                localStorage.setItem("cached_admin_reviews", JSON.stringify(reviews));
+            } catch (ce) {}
+        }
+    } catch (err) {
+        console.error("Reviews fetch error:", err);
+    }
+
+    try {
+        // Fetch Feedback
+        const fbRes = await fetchAdminApi("/api/feedback");
+        if (fbRes.ok) {
+            const feedback = await fbRes.json();
+            renderDashboardFeedback(feedback);
+            try {
+                localStorage.setItem("cached_admin_feedback", JSON.stringify(feedback));
+            } catch (ce) {}
+        }
+    } catch (err) {
+        console.error("Feedback fetch error:", err);
+    }
+}
+
+function escapeHTML(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+loadDashboardStats();
+</script>
+
+</body>
+</html>

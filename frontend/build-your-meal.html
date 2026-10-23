@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Royal Thali | Hotel Vahinisaheb</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ========================================================
+           ROYAL LUXURY "BUILD YOUR MEAL" STYLES
+        ======================================================== */
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f7e7b4;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --dark-card: rgba(26, 17, 10, 0.86);
+            --border-gold: rgba(212, 175, 55, 0.28);
+        }
+
+        body {
+            background: #0d0805;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(120, 53, 15, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(30, 15, 8, 0.5) 0%, transparent 70%);
+            color: #f3f0e6;
+            min-height: 100vh;
+        }
+
+        #meal-page-wrapper {
+            padding: 120px 7% 70px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header */
+        .meal-hero-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .meal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 20px;
+            background: rgba(212, 175, 55, 0.14);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 25px;
+            color: #d4af37;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .meal-hero-header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+            color: #fff;
+            margin: 0 0 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .meal-hero-header h1 span {
+            background: linear-gradient(135deg, #f7e7b4, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meal-hero-header p {
+            max-width: 760px;
+            margin: 0 auto;
+            color: #bfaea2;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        /* Preset Thali Buttons Bar */
+        .preset-strip-wrapper {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 18px;
+            padding: 18px 24px;
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .preset-strip-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #f7e7b4;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .preset-buttons-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 25px;
+            padding: 8px 18px;
+            color: #e0d8cf;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-preset:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.15);
+            color: #f7e7b4;
+            transform: translateY(-2px);
+        }
+
+        /* Two-column Thali Builder Grid */
+        .thali-builder-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 35px;
+            align-items: start;
+        }
+
+        /* Category Tabs & Item Browser */
+        .category-browser-card {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 32px 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+        }
+
+        .category-nav-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 14px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            scrollbar-width: thin;
+        }
+
+        .category-tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #ccc;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-tab-btn:hover {
+            color: #f7e7b4;
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .category-tab-btn.active {
+            background: #d4af37;
+            color: #120b06;
+            border-color: #d4af37;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+        }
+
+        .dishes-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 18px;
+        }
+
+        .dish-pick-card {
+            background: linear-gradient(145deg, rgba(32, 20, 12, 0.75), rgba(18, 11, 7, 0.95));
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .dish-pick-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.15);
+        }
+
+        .dish-pick-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .dish-pick-icon {
+            font-size: 2.2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .dish-pick-info h4 {
+            margin: 0 0 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .dish-pick-info .price-tag {
+            color: #d4af37;
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+
+        .dish-pick-desc {
+            color: #888;
+            font-size: 0.76rem;
+            line-height: 1.5;
+            margin: 0 0 16px;
+        }
+
+        .btn-add-dish {
+            width: 100%;
+            padding: 9px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #f7e7b4;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-add-dish:hover {
+            background: #d4af37;
+            color: #120b06;
+            border-color: #d4af37;
+        }
+
+        .dish-pick-card.in-plate {
+            border-color: #d4af37;
+            background: linear-gradient(145deg, rgba(50, 30, 15, 0.85), rgba(22, 13, 8, 0.95));
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+        }
+
+        .dish-pick-card.in-plate .btn-add-dish {
+            background: #d4af37;
+            color: #120b06;
+        }
+
+        /* Right Panel: Live Thali Canvas & Summary */
+        .thali-summary-panel {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 100px;
+        }
+
+        /* Thali Plate Graphic Representation */
+        .thali-platter-visual {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #3d2212 0%, #170d07 70%, #0a0503 100%);
+            border: 6px solid #d4af37;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.35), inset 0 0 25px rgba(0, 0, 0, 0.8);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .thali-platter-visual::before {
+            content: '';
+            position: absolute;
+            width: 85%;
+            height: 85%;
+            border-radius: 50%;
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+        }
+
+        .thali-center-label {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .thali-center-label .crown-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+        }
+
+        .thali-center-label span {
+            font-family: 'Cinzel', serif;
+            font-size: 0.82rem;
+            color: #f7e7b4;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .thali-items-counter-badge {
+            font-size: 0.72rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        /* Itemized List */
+        .plate-items-container {
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 6px;
+            scrollbar-width: thin;
+        }
+
+        .plate-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            animation: fadeInItem 0.25s ease-out;
+        }
+
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .plate-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plate-item-left .icon {
+            font-size: 1.25rem;
+        }
+
+        .plate-item-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .plate-item-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .plate-item-price {
+            font-weight: 700;
+            color: #d4af37;
+            font-size: 0.88rem;
+        }
+
+        .btn-remove-item {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 0 4px;
+        }
+
+        .btn-remove-item:hover {
+            color: #ef4444;
+        }
+
+        .empty-thali-msg {
+            text-align: center;
+            padding: 25px 15px;
+            color: #777;
+            font-size: 0.85rem;
+        }
+
+        /* Bill Calculation Box */
+        .bill-calculation-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 22px;
+        }
+
+        .bill-line-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.84rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        .bill-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(212, 175, 55, 0.25);
+            padding-top: 12px;
+            margin-top: 10px;
+        }
+
+        .bill-total-row span.label {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .bill-total-row span.amount {
+            font-family: 'Cinzel', serif;
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #d4af37;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Action Buttons */
+        .btn-order-thali {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #d4af37, #9b722b);
+            color: #120b06;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn-order-thali:hover {
+            background: linear-gradient(135deg, #f7e7b4, #b88b35);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.45);
+        }
+
+        .btn-clear-thali {
+            width: 100%;
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #888;
+            padding: 9px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-thali:hover {
+            color: #fff;
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Order Confirmation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(145deg, #22140c, #100a06);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 35px 32px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            position: relative;
+            animation: modalFade 0.3s ease-out;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: #f7e7b4;
+            margin: 0 0 10px;
+        }
+
+        .modal-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0 0 20px;
+        }
+
+        .modal-receipt-summary {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 22px;
+            text-align: left;
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .btn-close-modal {
+            background: #d4af37;
+            color: #120b06;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        .btn-close-modal:hover {
+            background: #f7e7b4;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .thali-builder-grid {
+                grid-template-columns: 1fr;
+            }
+            .thali-summary-panel {
+                position: static;
+                order: -1; /* Place summary and plate on top for mobile */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ========================================================
+     NAVIGATION BAR
+======================================================== -->
+<header>
+    <nav class="navbar">
+        <a href="index.html" class="brand">
+            <img src="./logo.jpeg" alt="Hotel Vahinisaheb">
+            <div class="brand-text">
+                <h3>Hotel Vahinisaheb</h3>
+                <p>Authentic Maharashtrian Taste</p>
+            </div>
+        </a>
+
+        <div class="menu-toggle" onclick="toggleMenu()">
+            ☰
+        </div>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="menu.html">Menu</a></li>
+            <li><a class="active" href="build-your-meal.html">Build Your Meal</a></li>
+            <li><a href="ai-recommendation.html">AI Recommendation</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="admin-login.html">🔐 Admin</a></li>
+        </ul>
+    </nav>
+</header>
+
+
+<!-- ========================================================
+     BUILD YOUR MEAL MAIN CONTENT
+======================================================== -->
+<main id="meal-page-wrapper">
+
+    <!-- Hero Header -->
+    <div class="meal-hero-header">
+        <div class="meal-badge">
+            <span>👑 Interactive Culinary Workshop</span>
+        </div>
+        <h1>Build Your Royal <span>Maharashtrian Thali</span></h1>
+        <p>
+            Customize your feast just the way you like! Choose your signature curries, rustic breads, steamed rice, digestifs, and festive sweets. Watch your royal platter assemble in real time.
+        </p>
+    </div>
+
+    <!-- 1-Click Signature Preset Combinations -->
+    <div class="preset-strip-wrapper">
+        <div class="preset-strip-title">
+            <span>⚡ Quick 1-Click Chef Combos:</span>
+        </div>
+        <div class="preset-buttons-group">
+            <button type="button" class="btn-preset" onclick="loadThaliPreset('mutton')">
+                <span>🍗 Kolhapuri Mutton Feast</span>
+            </button>
+            <button type="button" class="btn-preset" onclick="loadThaliPreset('veg_royal')">
+                <span>🍛 Royal Maharashtrian Thali</span>
+            </button>
+            <button type="button" class="btn-preset" onclick="loadThaliPreset('pithla')">
+                <span>🫓 Rustic Pithla Bhakri</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Two-Column Interactive Layout -->
+    <div class="thali-builder-grid">
+
+        <!-- Left: Category Item Browser -->
+        <div class="category-browser-card">
+            
+            <!-- Category Tabs -->
+            <div class="category-nav-tabs">
+                <button type="button" class="category-tab-btn active" onclick="switchCategory('mains', this)">
+                    <span>🍲 Main Curries</span>
+                </button>
+                <button type="button" class="category-tab-btn" onclick="switchCategory('breads', this)">
+                    <span>🫓 Traditional Breads</span>
+                </button>
+                <button type="button" class="category-tab-btn" onclick="switchCategory('rice', this)">
+                    <span>🍚 Rice & Staples</span>
+                </button>
+                <button type="button" class="category-tab-btn" onclick="switchCategory('drinks', this)">
+                    <span>🥛 Drinks & Digestifs</span>
+                </button>
+                <button type="button" class="category-tab-btn" onclick="switchCategory('sweets', this)">
+                    <span>🍯 Sweets & Desserts</span>
+                </button>
+            </div>
+
+            <!-- Dishes Grid -->
+            <div class="dishes-selection-grid" id="dishesGridContainer">
+                <!-- Rendered dynamically via JavaScript -->
+            </div>
+
+        </div>
+
+
+        <!-- Right: Visual Thali Platter & Order Bill Hub -->
+        <div class="thali-summary-panel">
+            
+            <!-- Silver Thali Visual Platter -->
+            <div class="thali-platter-visual">
+                <div class="thali-center-label">
+                    <span class="crown-icon">👑</span>
+                    <span>Royal Thali</span>
+                    <div class="thali-items-counter-badge" id="thaliItemCountText">0 Items Selected</div>
+                </div>
+            </div>
+
+            <!-- Itemized List -->
+            <h4 style="font-family:'Cinzel',serif; color:#f7e7b4; margin:0 0 12px; font-size:1.1rem; display:flex; justify-content:space-between; align-items:center;">
+                <span>Platter Contents</span>
+                <span style="font-size:0.75rem; color:#aaa; font-family:sans-serif;" id="plateSummarySubtitle">Empty Plate</span>
+            </h4>
+
+            <div class="plate-items-container" id="plateItemsContainer">
+                <div class="empty-thali-msg">
+                    Tap dishes on the left to add items to your royal thali!
+                </div>
+            </div>
+
+            <!-- Bill Calculation Box -->
+            <div class="bill-calculation-box">
+                <div class="bill-line-row">
+                    <span>Dishes Subtotal</span>
+                    <span id="billSubtotal">₹0.00</span>
+                </div>
+                <div class="bill-line-row">
+                    <span>Dining Tax & Service</span>
+                    <span style="color:#86efac;">Included</span>
+                </div>
+                <div class="bill-total-row">
+                    <span class="label">Total Amount:</span>
+                    <span class="amount" id="billTotalAmount">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <button type="button" class="btn-order-thali" onclick="openOrderModal()">
+                <span>🍽️ Order This Custom Feast</span>
+                <span>→</span>
+            </button>
+
+            <button type="button" class="btn-clear-thali" onclick="clearThali()">
+                <span>🔄 Reset / Clear Platter</span>
+            </button>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- ========================================================
+     ORDER CONFIRMATION MODAL
+======================================================== -->
+<div class="modal-overlay" id="orderModalOverlay">
+    <div class="modal-card">
+        <span style="font-size:3rem;">👑</span>
+        <h3>Custom Thali Prepared!</h3>
+        <p>Your authentic Maharashtrian feast combination has been customized.</p>
+        
+        <div class="modal-receipt-summary" id="modalReceiptSummary">
+            <!-- Dynamically populated -->
+        </div>
+
+        <button type="button" class="btn-close-modal" onclick="closeOrderModal()">
+            Done / Close
+        </button>
+    </div>
+</div>
+
+
+<!-- ========================================================
+     FOOTER
+======================================================== -->
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3>Hotel Vahinisaheb</h3>
+            <p>महाराष्ट्राच्या चवीचा खरा आस्वाद.</p>
+            <p>Authentic Maharashtrian food, prepared with tradition and warmth.</p>
+        </div>
+
+        <div>
+            <h3>Quick Links</h3>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="build-your-meal.html">Build Your Meal</a>
+            <a href="ai-recommendation.html">AI Recommendation</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+
+        <div>
+            <h3>Connect</h3>
+            <a href="about.html">About Us</a>
+            <a href="reviews.html">Customer Reviews</a>
+            <a href="contact.html">Contact & Location</a>
+            <a href="admin-login.html" style="color:#d4af37;font-weight:600;">🔐 Admin Portal</a>
+        </div>
+    </div>
+
+    <div class="copyright">
+        © 2026 Hotel Vahinisaheb. All Rights Reserved.
+    </div>
+</footer>
+
+
+<!-- Scripts -->
+<script src="script.js"></script>
+
+<script>
+// ==========================================
+// CULINARY DATABASE FOR THALI BUILDER
+// ==========================================
+const MEAL_CATALOG = {
+    mains: [
+        { id: "m1", name: "Maharashtrian Thali", icon: "🍛", price: 280, desc: "Grand multi-curry royal combination" },
+        { id: "m2", name: "Kolhapuri Mutton Rassa", icon: "🍗", price: 320, desc: "Slow-cooked fiery tambda & pandhra rassa" },
+        { id: "m3", name: "Chicken Masala", icon: "🍗", price: 260, desc: "Tender chicken in roasted rustic spices" },
+        { id: "m4", name: "Bharli Vangi", icon: "🍆", price: 190, desc: "Stuffed baby eggplants with peanut masala" },
+        { id: "m5", name: "Chulivarcha Pithla", icon: "🫓", price: 160, desc: "Traditional gram flour curry with garlic" },
+        { id: "m6", name: "Paneer Kolhapuri", icon: "🧀", price: 210, desc: "Fresh cottage cheese in zesty red gravy" }
+    ],
+    breads: [
+        { id: "b1", name: "Jowar Bhakri", icon: "🫓", price: 50, desc: "Freshly roasted sorghum flatbread" },
+        { id: "b2", name: "Bajra Bhakri", icon: "🫓", price: 50, desc: "Warm rustic pearl millet bread" },
+        { id: "b3", name: "Tawa Chapati", icon: "🫓", price: 30, desc: "Soft whole wheat phulka" },
+        { id: "b4", name: "Butter Naan", icon: "🫓", price: 45, desc: "Char-grilled clay oven bread with butter" }
+    ],
+    rice: [
+        { id: "r1", name: "Steamed Basmati Rice", icon: "🍚", price: 90, desc: "Aromatic long-grain white rice" },
+        { id: "r2", name: "Jeera Rice", icon: "🍚", price: 120, desc: "Tempered cumin seeds with pure ghee" },
+        { id: "r3", name: "Maharashtrian Dal Khichdi", icon: "🍲", price: 140, desc: "Comforting lentils & rice with spices" }
+    ],
+    drinks: [
+        { id: "d1", name: "Spiced Taak (Buttermilk)", icon: "🥛", price: 40, desc: "Chilled buttermilk with mustard & coriander" },
+        { id: "d2", name: "Konkani Solkadhi", icon: "🍷", price: 60, desc: "Pink kokum digestif with coconut milk" },
+        { id: "d3", name: "Kesar Mango Lassi", icon: "🥭", price: 70, desc: "Thick creamy yogurt drink infused with saffron" }
+    ],
+    sweets: [
+        { id: "s1", name: "Puran Poli with Ghee", icon: "🥞", price: 120, desc: "Sweet lentil stuffed flatbread with desi ghee" },
+        { id: "s2", name: "Kesar Shrikhand", icon: "🍯", price: 100, desc: "Silky strained yogurt sweetened with cardamom" },
+        { id: "s3", name: "Hot Gulab Jamun", icon: "🟤", price: 80, desc: "Melt-in-mouth milk dumplings in rose syrup" }
+    ]
+};
+
+// State: Selected items map: { id: { ...dish, qty: 1 } }
+let selectedPlateItems = {};
+let currentCategory = 'mains';
+
+function switchCategory(catKey, btn) {
+    currentCategory = catKey;
+    document.querySelectorAll('.category-tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderCategoryDishes();
+}
+
+function renderCategoryDishes() {
+    const container = document.getElementById("dishesGridContainer");
+    if (!container) return;
+
+    const items = MEAL_CATALOG[currentCategory] || [];
+    container.innerHTML = "";
+
+    items.forEach(item => {
+        const isInPlate = !!selectedPlateItems[item.id];
+        const card = document.createElement("div");
+        card.className = `dish-pick-card ${isInPlate ? 'in-plate' : ''}`;
+        card.id = `card-${item.id}`;
+
+        card.innerHTML = `
+            <div>
+                <div class="dish-pick-top">
+                    <div class="dish-pick-icon">${item.icon}</div>
+                    <div class="dish-pick-info">
+                        <h4>${item.name}</h4>
+                        <span class="price-tag">₹${item.price}.00</span>
+                    </div>
+                </div>
+                <p class="dish-pick-desc">${item.desc}</p>
+            </div>
+            <button type="button" class="btn-add-dish" onclick="togglePlateItem('${item.id}', '${currentCategory}')">
+                <span>${isInPlate ? '✓ Added to Plate' : '➕ Add to Thali'}</span>
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function togglePlateItem(itemId, categoryKey) {
+    if (selectedPlateItems[itemId]) {
+        delete selectedPlateItems[itemId];
+    } else {
+        const dish = MEAL_CATALOG[categoryKey].find(d => d.id === itemId);
+        if (dish) {
+            selectedPlateItems[itemId] = { ...dish, qty: 1 };
+        }
+    }
+
+    updatePlateUI();
+    renderCategoryDishes();
+}
+
+function removePlateItem(itemId) {
+    delete selectedPlateItems[itemId];
+    updatePlateUI();
+    renderCategoryDishes();
+}
+
+function updatePlateUI() {
+    const listContainer = document.getElementById("plateItemsContainer");
+    const countBadge = document.getElementById("thaliItemCountText");
+    const summarySubtitle = document.getElementById("plateSummarySubtitle");
+    const subtotalElem = document.getElementById("billSubtotal");
+    const totalElem = document.getElementById("billTotalAmount");
+
+    const items = Object.values(selectedPlateItems);
+    const count = items.length;
+
+    countBadge.textContent = `${count} Item${count !== 1 ? 's' : ''} Selected`;
+    summarySubtitle.textContent = count > 0 ? `${count} items in royal platter` : 'Empty Plate';
+
+    if (count === 0) {
+        listContainer.innerHTML = `
+            <div class="empty-thali-msg">
+                Tap dishes on the left to add items to your royal thali!
+            </div>
+        `;
+        subtotalElem.textContent = "₹0.00";
+        totalElem.textContent = "₹0.00";
+        return;
+    }
+
+    listContainer.innerHTML = "";
+    let total = 0;
+
+    items.forEach(item => {
+        total += item.price;
+        const row = document.createElement("div");
+        row.className = "plate-item-row";
+
+        row.innerHTML = `
+            <div class="plate-item-left">
+                <span class="icon">${item.icon}</span>
+                <span class="plate-item-name">${item.name}</span>
+            </div>
+            <div class="plate-item-right">
+                <span class="plate-item-price">₹${item.price}</span>
+                <button type="button" class="btn-remove-item" onclick="removePlateItem('${item.id}')" title="Remove">✕</button>
+            </div>
+        `;
+
+        listContainer.appendChild(row);
+    });
+
+    subtotalElem.textContent = `₹${total}.00`;
+    totalElem.textContent = `₹${total}.00`;
+}
+
+function clearThali() {
+    selectedPlateItems = {};
+    updatePlateUI();
+    renderCategoryDishes();
+}
+
+// Quick 1-click Preset Loaders
+function loadThaliPreset(presetKey) {
+    selectedPlateItems = {};
+
+    if (presetKey === 'mutton') {
+        const pMutton = MEAL_CATALOG.mains.find(d => d.id === 'm2');
+        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b2');
+        const pRice = MEAL_CATALOG.rice.find(d => d.id === 'r2');
+        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd2');
+        const pSweet = MEAL_CATALOG.sweets.find(d => d.id === 's1');
+        [pMutton, pBhakri, pRice, pDrink, pSweet].forEach(item => {
+            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
+        });
+    } else if (presetKey === 'veg_royal') {
+        const pThali = MEAL_CATALOG.mains.find(d => d.id === 'm1');
+        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b1');
+        const pRice = MEAL_CATALOG.rice.find(d => d.id === 'r1');
+        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd1');
+        const pSweet = MEAL_CATALOG.sweets.find(d => d.id === 's2');
+        [pThali, pBhakri, pRice, pDrink, pSweet].forEach(item => {
+            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
+        });
+    } else if (presetKey === 'pithla') {
+        const pPithla = MEAL_CATALOG.mains.find(d => d.id === 'm5');
+        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b1');
+        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd1');
+        [pPithla, pBhakri, pDrink].forEach(item => {
+            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
+        });
+    }
+
+    updatePlateUI();
+    renderCategoryDishes();
+}
+
+// Modal Order Showcase
+function openOrderModal() {
+    const items = Object.values(selectedPlateItems);
+    if (items.length === 0) {
+        alert("Please add at least one dish to your platter before placing an order!");
+        return;
+    }
+
+    const modalSummary = document.getElementById("modalReceiptSummary");
+    let total = 0;
+    let html = `<ul style="margin:0; padding-left:18px; color:#ddd; font-size:0.85rem; line-height:1.8;">`;
+
+    items.forEach(i => {
+        total += i.price;
+        html += `<li><strong>${i.name}</strong> - ₹${i.price}</li>`;
+    });
+
+    html += `</ul><div style="margin-top:12px; border-top:1px solid rgba(212,175,55,0.3); padding-top:8px; font-weight:800; color:#d4af37; font-size:1.05rem;">Grand Total: ₹${total}.00</div>`;
+
+    modalSummary.innerHTML = html;
+    document.getElementById("orderModalOverlay").style.display = "flex";
+}
+
+function closeOrderModal() {
+    document.getElementById("orderModalOverlay").style.display = "none";
+}
+
+// Initial Render
+renderCategoryDishes();
+updatePlateUI();
+</script>
+
+</body>
+</html>

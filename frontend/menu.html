@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Menu | Hotel Vahinisaheb</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+<header>
+
+    <nav class="navbar">
+
+
+<a href="index.html" class="brand">
+
+            <img src="./logo.jpeg"
+                 alt="Hotel Vahinisaheb">
+
+            <div class="brand-text">
+
+                <h3>Hotel Vahinisaheb</h3>
+
+                <p>
+                    Authentic Maharashtrian Taste
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <div class="menu-toggle"
+             onclick="toggleMenu()">
+            ☰
+        </div>
+
+
+        <ul class="nav-links" id="navLinks">
+
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+
+            <li>
+                <a class="active"
+                   href="menu.html">
+                    Menu
+                </a>
+            </li>
+
+            <li>
+                <a href="build-your-meal.html">
+                    Build Your Meal
+                </a>
+            </li>
+
+            <li>
+                <a href="ai-recommendation.html">
+                    AI Recommendation
+                </a>
+            </li>
+
+            <li>
+                <a href="gallery.html">
+                    Gallery
+                </a>
+            </li>
+
+            <li>
+                <a href="about.html">
+                    About
+                </a>
+            </li>
+
+            <li>
+                <a href="reviews.html">
+                    Reviews
+                </a>
+            </li>
+
+            <li>
+                <a href="contact.html">
+                    Contact
+                </a>
+            </li>
+
+            <li>
+    <a href="admin-login.html">
+        🔐 Admin
+    </a>
+</li>
+
+        </ul>
+
+    </nav>
+
+</header>
+
+
+<section id="menu">
+
+    <div class="section-title">
+
+        <span>Our Menu</span>
+
+        <h2>Discover Our Flavours</h2>
+
+        <p>
+            Explore our carefully prepared dishes made
+            using authentic Maharashtrian flavours.
+        </p>
+
+    </div>
+
+
+    <div class="menu-search">
+
+        <input
+            id="menuSearch"
+            type="search"
+            placeholder="Search dishes..."
+            oninput="searchMenu()">
+
+    </div>
+
+
+    <div class="menu-filters">
+
+        <button class="filter-btn active"
+                onclick="filterMenu('all',this)">
+            All
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterMenu('veg',this)">
+            Veg
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterMenu('nonveg',this)">
+            Non-Veg
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterMenu('breads',this)">
+            Breads
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterMenu('drinks',this)">
+            Beverages
+        </button>
+
+    </div>
+
+
+    <div class="menu-grid" id="menuGrid">
+    <p>Loading menu...</p>
+    </div>
+
+
+    <div id="noResults"
+         class="no-results">
+
+        No dishes found.
+        Try another search.
+
+    </div>
+
+</section>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

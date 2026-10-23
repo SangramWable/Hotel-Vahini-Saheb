@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dish Recommendation | Hotel Vahinisaheb</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ========================================================
+           ROYAL LUXURY AI RECOMMENDATION STYLES
+        ======================================================== */
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f7e7b4;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --dark-card: rgba(28, 17, 10, 0.85);
+            --border-gold: rgba(212, 175, 55, 0.28);
+        }
+
+        body {
+            background: #0d0805;
+            background-image: 
+                radial-gradient(circle at 20% 15%, rgba(120, 53, 15, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 80% 75%, rgba(212, 175, 55, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(30, 15, 8, 0.6) 0%, transparent 70%);
+            color: #f3f0e6;
+            min-height: 100vh;
+        }
+
+        #ai-page-wrapper {
+            padding: 120px 7% 70px;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        /* Hero Header */
+        .ai-hero-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 20px;
+            background: rgba(212, 175, 55, 0.14);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 25px;
+            color: #d4af37;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .ai-hero-header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+            color: #fff;
+            margin: 0 0 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-hero-header h1 span {
+            background: linear-gradient(135deg, #f7e7b4, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ai-hero-header p {
+            max-width: 720px;
+            margin: 0 auto;
+            color: #bfaea2;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        /* AI Interactive Workspace Layout */
+        .ai-workspace-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 35px;
+            align-items: start;
+        }
+
+        /* Input Controls Panel */
+        .ai-control-panel {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 36px 38px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+            position: relative;
+        }
+
+        .ai-control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, #f7e7b4, #78350f);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .panel-heading .icon {
+            font-size: 1.8rem;
+        }
+
+        .panel-heading h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.35rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .preference-section {
+            margin-bottom: 26px;
+        }
+
+        .preference-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #f7e7b4;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preference-title span.hint {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: none;
+            font-weight: normal;
+        }
+
+        /* Option Chips Grid */
+        .choice-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .choice-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 14px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .choice-chip .chip-icon {
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .choice-chip .chip-title {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #e0d8cf;
+        }
+
+        .choice-chip .chip-desc {
+            font-size: 0.72rem;
+            color: #888;
+        }
+
+        .choice-chip:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .choice-chip:hover .chip-icon {
+            transform: scale(1.15);
+        }
+
+        .choice-chip.active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(120, 53, 15, 0.3));
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+        }
+
+        .choice-chip.active .chip-title {
+            color: #f7e7b4;
+        }
+
+        /* Generate Button */
+        .btn-ai-generate {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #d4af37, #9b722b);
+            color: #120b06;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-ai-generate:hover {
+            background: linear-gradient(135deg, #f7e7b4, #b88b35);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.45);
+        }
+
+        /* Result Presentation Panel */
+        .ai-result-panel {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 34px 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 100px;
+        }
+
+        /* Empty State */
+        .ai-placeholder-state {
+            text-align: center;
+            padding: 45px 20px;
+        }
+
+        .ai-chef-avatar {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #d4af37, #78350f);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+            border: 2px solid #f7e7b4;
+            animation: pulseAvatar 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseAvatar {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(212, 175, 55, 0.55); }
+        }
+
+        .ai-placeholder-state h4 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.25rem;
+            color: #f7e7b4;
+            margin: 0 0 10px;
+        }
+
+        .ai-placeholder-state p {
+            color: #999;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Loader Animation */
+        .ai-loading-box {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .ai-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ai-loading-box h4 {
+            font-family: 'Cinzel', serif;
+            color: #f7e7b4;
+            margin: 0 0 8px;
+        }
+
+        .ai-loading-box p {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Active Recommendation Card */
+        .recommended-card {
+            display: none;
+            animation: fadeInCard 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInCard {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .match-badge-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .match-score-pill {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid #22c55e;
+            color: #86efac;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .category-badge-pill {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            color: #f7e7b4;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .dish-hero-visual {
+            background: linear-gradient(135deg, rgba(60, 30, 15, 0.5), rgba(20, 10, 5, 0.8));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 18px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dish-icon-display {
+            font-size: 4rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+        }
+
+        .dish-name-display {
+            font-family: 'Cinzel', serif;
+            font-size: 1.45rem;
+            color: #fff;
+            margin: 0 0 6px;
+        }
+
+        .dish-price-display {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #d4af37;
+        }
+
+        .chef-notes-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #d4af37;
+            padding: 14px 16px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+        }
+
+        .chef-notes-box h5 {
+            margin: 0 0 6px;
+            color: #f7e7b4;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chef-notes-box p {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .pairing-recommendation {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pairing-recommendation .pair-icon {
+            font-size: 1.6rem;
+        }
+
+        .pairing-recommendation .pair-info h6 {
+            margin: 0 0 3px;
+            color: #f7e7b4;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+        }
+
+        .pairing-recommendation .pair-info p {
+            margin: 0;
+            color: #bbb;
+            font-size: 0.84rem;
+        }
+
+        .card-actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-card-action {
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-card-primary {
+            background: #d4af37;
+            color: #120b06;
+            border: 1px solid #d4af37;
+        }
+
+        .btn-card-primary:hover {
+            background: #f7e7b4;
+            transform: translateY(-2px);
+        }
+
+        .btn-card-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f7e7b4;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-card-secondary:hover {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+            transform: translateY(-2px);
+        }
+
+        /* Quick Picks Strip */
+        .quick-picks-section {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .quick-picks-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quick-picks-header h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            color: #fff;
+            margin: 0 0 8px;
+        }
+
+        .quick-picks-header p {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .quick-picks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+
+        .quick-pick-card {
+            background: linear-gradient(145deg, rgba(30, 18, 11, 0.75), rgba(16, 10, 6, 0.9));
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            border-radius: 18px;
+            padding: 22px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .quick-pick-card:hover {
+            transform: translateY(-4px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+        }
+
+        .quick-pick-icon {
+            font-size: 2.2rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 14px;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .quick-pick-meta h4 {
+            margin: 0 0 4px;
+            color: #fff;
+            font-size: 0.96rem;
+            font-family: 'Cinzel', serif;
+        }
+
+        .quick-pick-meta p {
+            margin: 0 0 6px;
+            color: #888;
+            font-size: 0.78rem;
+        }
+
+        .quick-pick-meta .tag {
+            color: #d4af37;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .ai-workspace-grid {
+                grid-template-columns: 1fr;
+            }
+            .ai-result-panel {
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ========================================================
+     NAVIGATION BAR
+======================================================== -->
+<header>
+    <nav class="navbar">
+        <a href="index.html" class="brand">
+            <img src="./logo.jpeg" alt="Hotel Vahinisaheb">
+            <div class="brand-text">
+                <h3>Hotel Vahinisaheb</h3>
+                <p>Authentic Maharashtrian Taste</p>
+            </div>
+        </a>
+
+        <div class="menu-toggle" onclick="toggleMenu()">
+            ☰
+        </div>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="menu.html">Menu</a></li>
+            <li><a href="build-your-meal.html">Build Your Meal</a></li>
+            <li><a class="active" href="ai-recommendation.html">AI Recommendation</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="admin-login.html">🔐 Admin</a></li>
+        </ul>
+    </nav>
+</header>
+
+
+<!-- ========================================================
+     AI RECOMMENDATION MAIN CONTENT
+======================================================== -->
+<main id="ai-page-wrapper">
+
+    <!-- Hero Header -->
+    <div class="ai-hero-header">
+        <div class="ai-badge">
+            <span>🤖 Smart Culinary Intelligence</span>
+        </div>
+        <h1>Personalized AI <span>Dish Concierge</span></h1>
+        <p>
+            Not sure what to indulge in today? Select your food preference, spice appetite, dining mood, and budget. Our culinary engine will match you with the perfect authentic Maharashtrian recipe.
+        </p>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="ai-workspace-grid">
+
+        <!-- Controls Panel -->
+        <div class="ai-control-panel">
+            <div class="panel-heading">
+                <span class="icon">✨</span>
+                <div>
+                    <h3>Define Your Cravings</h3>
+                    <p style="margin: 3px 0 0; color: #888; font-size: 0.82rem;">Select attributes to generate your personalized match</p>
+                </div>
+            </div>
+
+            <!-- Preference 1: Food Type -->
+            <div class="preference-section">
+                <div class="preference-title">
+                    <span>1. Food Preference</span>
+                    <span class="hint">Tap to select</span>
+                </div>
+                <div class="choice-chips-grid" id="typeGroup">
+                    <div class="choice-chip active" data-group="type" data-val="veg" onclick="selectChip(this)">
+                        <span class="chip-icon">🌱</span>
+                        <span class="chip-title">Vegetarian</span>
+                        <span class="chip-desc">Pure Veg Delights</span>
+                    </div>
+                    <div class="choice-chip" data-group="type" data-val="nonveg" onclick="selectChip(this)">
+                        <span class="chip-icon">🍗</span>
+                        <span class="chip-title">Non-Veg</span>
+                        <span class="chip-desc">Mutton & Chicken</span>
+                    </div>
+                    <div class="choice-chip" data-group="type" data-val="coastal" onclick="selectChip(this)">
+                        <span class="chip-icon">🐟</span>
+                        <span class="chip-title">Coastal & Fish</span>
+                        <span class="chip-desc">Konkani Specials</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preference 2: Spice Level -->
+            <div class="preference-section">
+                <div class="preference-title">
+                    <span>2. Spice Tolerance</span>
+                    <span class="hint">Kolhapuri intensity</span>
+                </div>
+                <div class="choice-chips-grid" id="spiceGroup">
+                    <div class="choice-chip" data-group="spice" data-val="mild" onclick="selectChip(this)">
+                        <span class="chip-icon">🌿</span>
+                        <span class="chip-title">Mild & Aromatic</span>
+                        <span class="chip-desc">Gentle spices</span>
+                    </div>
+                    <div class="choice-chip active" data-group="spice" data-val="medium" onclick="selectChip(this)">
+                        <span class="chip-icon">🌶️</span>
+                        <span class="chip-title">Medium Masala</span>
+                        <span class="chip-desc">Authentic balance</span>
+                    </div>
+                    <div class="choice-chip" data-group="spice" data-val="spicy" onclick="selectChip(this)">
+                        <span class="chip-icon">🔥</span>
+                        <span class="chip-title">Fiery Kolhapuri</span>
+                        <span class="chip-desc">Tambda Rassa kick</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preference 3: Dining Vibe / Mood -->
+            <div class="preference-section">
+                <div class="preference-title">
+                    <span>3. Dining Occasion</span>
+                    <span class="hint">What describes your meal?</span>
+                </div>
+                <div class="choice-chips-grid" id="vibeGroup">
+                    <div class="choice-chip active" data-group="vibe" data-val="royal" onclick="selectChip(this)">
+                        <span class="chip-icon">👑</span>
+                        <span class="chip-title">Royal Feast</span>
+                        <span class="chip-desc">Grand Thali style</span>
+                    </div>
+                    <div class="choice-chip" data-group="vibe" data-val="quick" onclick="selectChip(this)">
+                        <span class="chip-icon">⚡</span>
+                        <span class="chip-title">Quick Traditional</span>
+                        <span class="chip-desc">Comfort bite</span>
+                    </div>
+                    <div class="choice-chip" data-group="vibe" data-val="healthy" onclick="selectChip(this)">
+                        <span class="chip-icon">🌾</span>
+                        <span class="chip-title">Rustic & Wholesome</span>
+                        <span class="chip-desc">Bhakri & Pithla</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preference 4: Budget Tier -->
+            <div class="preference-section">
+                <div class="preference-title">
+                    <span>4. Target Budget</span>
+                    <span class="hint">Per person estimate</span>
+                </div>
+                <div class="choice-chips-grid" id="budgetGroup">
+                    <div class="choice-chip" data-group="budget" data-val="low" onclick="selectChip(this)">
+                        <span class="chip-icon">💵</span>
+                        <span class="chip-title">Under ₹180</span>
+                        <span class="chip-desc">Pocket friendly</span>
+                    </div>
+                    <div class="choice-chip active" data-group="budget" data-val="medium" onclick="selectChip(this)">
+                        <span class="chip-icon">💳</span>
+                        <span class="chip-title">₹180 - ₹300</span>
+                        <span class="chip-desc">Chef's sweetspot</span>
+                    </div>
+                    <div class="choice-chip" data-group="budget" data-val="high" onclick="selectChip(this)">
+                        <span class="chip-icon">💎</span>
+                        <span class="chip-title">Above ₹300</span>
+                        <span class="chip-desc">Signature specials</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button type="button" class="btn-ai-generate" onclick="generateRecommendation()">
+                <span>✨ Curate My Perfect Dish</span>
+                <span>→</span>
+            </button>
+        </div>
+
+
+        <!-- Result Showcase Panel -->
+        <div class="ai-result-panel">
+
+            <!-- Empty / Idle State -->
+            <div class="ai-placeholder-state" id="aiPlaceholderState">
+                <div class="ai-chef-avatar">👨‍🍳</div>
+                <h4>Vahinisaheb AI Chef is Ready</h4>
+                <p>
+                    Select your preferences on the left and tap <strong>"Curate My Perfect Dish"</strong>. The AI chef will recommend the exact traditional dish tailored for your palate!
+                </p>
+            </div>
+
+            <!-- Loading State -->
+            <div class="ai-loading-box" id="aiLoadingBox">
+                <div class="ai-spinner"></div>
+                <h4>Analyzing Maharashtrian Recipes...</h4>
+                <p>Balancing spices, pairing breads, and matching your budget tier...</p>
+            </div>
+
+            <!-- Result Card -->
+            <div class="recommended-card" id="aiResultCard">
+                <div class="match-badge-bar">
+                    <div class="match-score-pill">
+                        <span>🎯</span> <span id="matchScoreText">98% Flavor Match</span>
+                    </div>
+                    <div class="category-badge-pill" id="categoryBadgeText">
+                        CHEF RECOMMENDED
+                    </div>
+                </div>
+
+                <div class="dish-hero-visual">
+                    <div class="dish-icon-display" id="dishIconDisplay">🍛</div>
+                    <h3 class="dish-name-display" id="dishNameDisplay">Maharashtrian Thali</h3>
+                    <div class="dish-price-display" id="dishPriceDisplay">₹280.00</div>
+                </div>
+
+                <div class="chef-notes-box">
+                    <h5><span>👨‍🍳</span> Chef's Flavor Notes</h5>
+                    <p id="dishNotesDisplay">
+                        Slow-cooked rustic gravies prepared with authentic homemade masala, providing an unmatched royal Maharashtrian dining experience.
+                    </p>
+                </div>
+
+                <div class="pairing-recommendation">
+                    <div class="pair-icon">🫓</div>
+                    <div class="pair-info">
+                        <h6>Best Paired With</h6>
+                        <p id="dishPairingDisplay">Hot Jowar Bhakri & Chilled Spiced Taak</p>
+                    </div>
+                </div>
+
+                <div class="card-actions-row">
+                    <a href="menu.html" class="btn-card-action btn-card-secondary">
+                        <span>📖 View in Menu</span>
+                    </a>
+                    <a href="build-your-meal.html" class="btn-card-action btn-card-primary">
+                        <span>➕ Build Thali</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         QUICK POPULAR AI PICKS STRIP
+    ======================================================== -->
+    <div class="quick-picks-section">
+        <div class="quick-picks-header">
+            <h3>⚡ Trending AI Curations Today</h3>
+            <p>Popular signature combinations crafted for diverse cravings</p>
+        </div>
+
+        <div class="quick-picks-grid">
+            <div class="quick-pick-card" onclick="loadPresetRecommendation('mutton')">
+                <div class="quick-pick-icon">🍗</div>
+                <div class="quick-pick-meta">
+                    <h4>Mutton Rassa Feast</h4>
+                    <p>Fiery Kolhapuri spicy mutton broth with Bajra Bhakri</p>
+                    <span class="tag">🔥 #1 for Spice Lovers • ₹320</span>
+                </div>
+            </div>
+
+            <div class="quick-pick-card" onclick="loadPresetRecommendation('thali')">
+                <div class="quick-pick-icon">🍛</div>
+                <div class="quick-pick-meta">
+                    <h4>Royal Maharashtrian Thali</h4>
+                    <p>Grand multi-dish platter with sweets, breads & dal</p>
+                    <span class="tag">👑 Best for Family Dinner • ₹280</span>
+                </div>
+            </div>
+
+            <div class="quick-pick-card" onclick="loadPresetRecommendation('pithla')">
+                <div class="quick-pick-icon">🫓</div>
+                <div class="quick-pick-meta">
+                    <h4>Chulivarcha Pithla Bhakri</h4>
+                    <p>Gram flour curry with roasted green chillies & Thecha</p>
+                    <span class="tag">🌾 Homestyle Comfort • ₹180</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+
+<!-- ========================================================
+     FOOTER
+======================================================== -->
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3>Hotel Vahinisaheb</h3>
+            <p>महाराष्ट्राच्या चवीचा खरा आस्वाद.</p>
+            <p>Authentic Maharashtrian food, prepared with tradition and warmth.</p>
+        </div>
+
+        <div>
+            <h3>Quick Links</h3>
+            <a href="index.html">Home</a>
+            <a href="menu.html">Menu</a>
+            <a href="build-your-meal.html">Build Your Meal</a>
+            <a href="ai-recommendation.html">AI Recommendation</a>
+            <a href="gallery.html">Gallery</a>
+        </div>
+
+        <div>
+            <h3>Connect</h3>
+            <a href="about.html">About Us</a>
+            <a href="reviews.html">Customer Reviews</a>
+            <a href="contact.html">Contact & Location</a>
+            <a href="admin-login.html" style="color:#d4af37;font-weight:600;">🔐 Admin Portal</a>
+        </div>
+    </div>
+
+    <div class="copyright">
+        © 2026 Hotel Vahinisaheb. All Rights Reserved.
+    </div>
+</footer>
+
+
+<!-- Scripts -->
+<script src="script.js"></script>
+
+<script>
+// ==========================================
+// INTERACTIVE AI CHIPS SELECTION & LOGIC
+// ==========================================
+function selectChip(element) {
+    const groupName = element.dataset.group;
+    const parentContainer = element.parentElement;
+    
+    // Deactivate siblings in same group
+    parentContainer.querySelectorAll('.choice-chip').forEach(chip => {
+        chip.classList.remove('active');
+    });
+
+    // Activate selected chip
+    element.classList.add('active');
+}
+
+function getSelectedValue(groupId) {
+    const activeChip = document.querySelector(`#${groupId} .choice-chip.active`);
+    return activeChip ? activeChip.dataset.val : '';
+}
+
+// Culinary database for dynamic recommendation matching
+const CULINARY_RECOMMENDATIONS = {
+    // Non-Veg combinations
+    "nonveg_spicy_high": {
+        name: "Kolhapuri Mutton Rassa Thali",
+        icon: "🍗",
+        price: "₹360.00",
+        score: "99% Perfect Match",
+        badge: "ROYAL CHEF SIGNATURE",
+        notes: "Fiery Tambda & Pandhra Rassa accompanied with tender Kolhapuri spiced mutton, slow cooked over chulha flame.",
+        pairing: "Hot Bajra Bhakri, Thecha & Chilled Solkadhi"
+    },
+    "nonveg_spicy_medium": {
+        name: "Kolhapuri Chicken Masala",
+        icon: "🍗",
+        price: "₹260.00",
+        score: "96% Perfect Match",
+        badge: "SPICY FAVORITE",
+        notes: "Succulent chicken morsels immersed in aromatic roasted coconut and stone-ground Maharashtrian spices.",
+        pairing: "Tawa Chapati & Spiced Buttermilk (Taak)"
+    },
+    "nonveg_mild_high": {
+        name: "Special Malvani Chicken Curry",
+        icon: "🍲",
+        price: "₹310.00",
+        score: "94% Flavor Match",
+        badge: "BALANCED FLAVOURS",
+        notes: "Mildly spiced fragrant chicken gravy gently simmered with fresh coconut milk and coriander.",
+        pairing: "Steamed Rice & Soft Phulkas"
+    },
+    "nonveg_mild_medium": {
+        name: "Maharashtrian Egg Curry Thali",
+        icon: "🥚",
+        price: "₹220.00",
+        score: "92% Flavor Match",
+        badge: "CLASSIC TASTE",
+        notes: "Golden eggs simmered in onion-tomato gravy with delicate Maharashtrian spices.",
+        pairing: "Hot Jowar Bhakri & Sliced Onions"
+    },
+    "nonveg_low": {
+        name: "Kolhapuri Egg Masala",
+        icon: "🥚",
+        price: "₹160.00",
+        score: "90% Value Match",
+        badge: "BUDGET DELIGHT",
+        notes: "Hearty and rustic egg curry made with homemade goda masala for a satisfying comfort meal.",
+        pairing: "2 Fresh Chapatis & Lemon Wedges"
+    },
+
+    // Veg combinations
+    "veg_spicy_high": {
+        name: "Special Kolhapuri Misal & Veg Feast",
+        icon: "🍲",
+        price: "₹320.00",
+        score: "97% Match",
+        badge: "FIERY VEG SIGNATURE",
+        notes: "Zesty sprouted bean curry topped with crisp farsan and fierce Kolhapuri cut, served with royal sides.",
+        pairing: "Pav, Dahi & Gulab Jamun"
+    },
+    "veg_spicy_medium": {
+        name: "Bharli Vangi (Stuffed Brinjal)",
+        icon: "🍆",
+        price: "₹190.00",
+        score: "98% Match",
+        badge: "TRADITIONAL FAVORITE",
+        notes: "Baby eggplants slow-cooked in a rich roasted peanut, sesame, and dry coconut masala gravy.",
+        pairing: "Piping Hot Jowar Bhakri & Raw Onion"
+    },
+    "veg_mild_high": {
+        name: "Grand Maharashtrian Veg Thali",
+        icon: "🍛",
+        price: "₹280.00",
+        score: "99% Royal Match",
+        badge: "BESTSELLER THALI",
+        notes: "Complete feast featuring 2 seasonal sabzis, dal amti, koshimbir, sweet puran poli, rice and papad.",
+        pairing: "Steamed Basmati Rice & Desi Ghee"
+    },
+    "veg_low": {
+        name: "Chulivarcha Pithla Bhakri",
+        icon: "🫓",
+        price: "₹160.00",
+        score: "96% Value Match",
+        badge: "AUTHENTIC RUSTIC",
+        notes: "Gram flour seasoned with mustard, green chillies, garlic and fresh coriander. The soul of rural Maharashtra.",
+        pairing: "Fresh Bajra Bhakri, Spicy Thecha & Taak"
+    },
+
+    // Coastal / Fish
+    "coastal_high": {
+        name: "Konkani Surmai Fry & Fish Thali",
+        icon: "🐟",
+        price: "₹380.00",
+        score: "98% Coastal Match",
+        badge: "COASTAL TREASURE",
+        notes: "Crisp rava-crusted Kingfish accompanied by fragrant kokum fish curry and steamed rice.",
+        pairing: "Authentic Pink Solkadhi & Bhakri"
+    },
+    "coastal_medium": {
+        name: "Konkani Fish Curry",
+        icon: "🐟",
+        price: "₹290.00",
+        score: "94% Flavor Match",
+        badge: "SEAFOOD SPECIAL",
+        notes: "Coastal fish cooked in tangy kokum and coconut milk gravy, bursting with coastal freshness.",
+        pairing: "Steamed White Rice & Fresh Lime"
+    }
+};
+
+function generateRecommendation() {
+    const type = getSelectedValue('typeGroup');
+    const spice = getSelectedValue('spiceGroup');
+    const budget = getSelectedValue('budgetGroup');
+    const vibe = getSelectedValue('vibeGroup');
+
+    const placeholder = document.getElementById('aiPlaceholderState');
+    const loader = document.getElementById('aiLoadingBox');
+    const resultCard = document.getElementById('aiResultCard');
+
+    placeholder.style.display = 'none';
+    resultCard.style.display = 'none';
+    loader.style.display = 'block';
+
+    // Simulate AI model reasoning and synthesis
+    setTimeout(() => {
+        loader.style.display = 'none';
+
+        // Match resolution
+        let key = `${type}_${spice}_${budget}`;
+        let matched = CULINARY_RECOMMENDATIONS[key];
+
+        if (!matched) {
+            if (type === 'coastal') {
+                matched = budget === 'high' ? CULINARY_RECOMMENDATIONS["coastal_high"] : CULINARY_RECOMMENDATIONS["coastal_medium"];
+            } else if (type === 'nonveg') {
+                matched = budget === 'high' ? CULINARY_RECOMMENDATIONS["nonveg_spicy_high"] : CULINARY_RECOMMENDATIONS["nonveg_spicy_medium"];
+            } else {
+                matched = budget === 'low' ? CULINARY_RECOMMENDATIONS["veg_low"] : CULINARY_RECOMMENDATIONS["veg_mild_high"];
+            }
+        }
+
+        // Populate elements
+        document.getElementById('dishNameDisplay').textContent = matched.name;
+        document.getElementById('dishIconDisplay').textContent = matched.icon;
+        document.getElementById('dishPriceDisplay').textContent = matched.price;
+        document.getElementById('matchScoreText').textContent = matched.score;
+        document.getElementById('categoryBadgeText').textContent = matched.badge;
+        document.getElementById('dishNotesDisplay').textContent = matched.notes;
+        document.getElementById('dishPairingDisplay').textContent = matched.pairing;
+
+        resultCard.style.display = 'block';
+    }, 900);
+}
+
+// Preset Quick Picks Click Handler
+function loadPresetRecommendation(type) {
+    if (type === 'mutton') {
+        setChipVal('typeGroup', 'nonveg');
+        setChipVal('spiceGroup', 'spicy');
+        setChipVal('budgetGroup', 'high');
+    } else if (type === 'thali') {
+        setChipVal('typeGroup', 'veg');
+        setChipVal('spiceGroup', 'medium');
+        setChipVal('budgetGroup', 'medium');
+    } else if (type === 'pithla') {
+        setChipVal('typeGroup', 'veg');
+        setChipVal('spiceGroup', 'mild');
+        setChipVal('budgetGroup', 'low');
+    }
+    generateRecommendation();
+    window.scrollTo({ top: 200, behavior: 'smooth' });
+}
+
+function setChipVal(groupId, val) {
+    const container = document.getElementById(groupId);
+    if (!container) return;
+    container.querySelectorAll('.choice-chip').forEach(c => {
+        if (c.dataset.val === val) {
+            c.classList.add('active');
+        } else {
+            c.classList.remove('active');
+        }
+    });
+}
+</script>
+
+</body>
+</html>
