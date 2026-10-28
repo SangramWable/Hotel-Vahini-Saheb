@@ -14,30 +14,38 @@
             --gold: #d4af37;
             --gold-light: #f7e7b4;
             --gold-glow: rgba(212, 175, 55, 0.4);
-            --dark-card: rgba(26, 17, 10, 0.86);
+            --dark-card: rgba(26, 17, 10, 0.88);
             --border-gold: rgba(212, 175, 55, 0.28);
+            --border-gold-bright: rgba(212, 175, 55, 0.7);
+            /* Toggle dish thumbnails: flex = show, none = hide name/price only */
+            --bym-dish-image-display: flex;
+        }
+
+        /* Easy image kill-switch: add class "bym-hide-images" on <body> to hide all dish images */
+        body.bym-hide-images {
+            --bym-dish-image-display: none;
         }
 
         body {
             background: #0d0805;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(120, 53, 15, 0.22) 0%, transparent 45%),
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(120, 53, 15, 0.25) 0%, transparent 45%),
                 radial-gradient(circle at 85% 80%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(30, 15, 8, 0.5) 0%, transparent 70%);
+                radial-gradient(circle at 50% 50%, rgba(30, 15, 8, 0.55) 0%, transparent 70%);
             color: #f3f0e6;
             min-height: 100vh;
         }
 
         #meal-page-wrapper {
-            padding: 120px 7% 70px;
-            max-width: 1280px;
+            padding: 120px 6% 70px;
+            max-width: 1320px;
             margin: 0 auto;
         }
 
         /* Hero Header */
         .meal-hero-header {
             text-align: center;
-            margin-bottom: 45px;
+            margin-bottom: 35px;
         }
 
         .meal-badge {
@@ -58,7 +66,7 @@
 
         .meal-hero-header h1 {
             font-family: 'Cinzel', serif;
-            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+            font-size: clamp(2rem, 4.2vw, 3.2rem);
             color: #fff;
             margin: 0 0 14px;
             letter-spacing: 0.5px;
@@ -74,112 +82,66 @@
             max-width: 760px;
             margin: 0 auto;
             color: #bfaea2;
-            font-size: 1.05rem;
+            font-size: 1rem;
             line-height: 1.7;
         }
 
-        /* Preset Thali Buttons Bar */
-        .preset-strip-wrapper {
+        /* Controls Strip (Category Tabs + Search) */
+        .meal-controls-bar {
             background: var(--dark-card);
             border: 1px solid var(--border-gold);
             border-radius: 18px;
-            padding: 18px 24px;
-            margin-bottom: 35px;
+            padding: 16px 22px;
+            margin-bottom: 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .preset-strip-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: #f7e7b4;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .preset-buttons-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-preset {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.35);
-            border-radius: 25px;
-            padding: 8px 18px;
-            color: #e0d8cf;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-preset:hover {
-            border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.15);
-            color: #f7e7b4;
-            transform: translateY(-2px);
-        }
-
-        /* Two-column Thali Builder Grid */
-        .thali-builder-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 35px;
-            align-items: start;
-        }
-
-        /* Category Tabs & Item Browser */
-        .category-browser-card {
-            background: var(--dark-card);
-            border: 1px solid var(--border-gold);
-            border-radius: 24px;
-            padding: 32px 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(12px);
         }
 
         .category-nav-tabs {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             overflow-x: auto;
-            padding-bottom: 14px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 4px;
             scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+            flex: 1 1 auto;
+        }
+
+        .category-nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .category-nav-tabs::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
         }
 
         .category-tab-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            border-radius: 20px;
-            padding: 8px 16px;
-            color: #ccc;
-            font-size: 0.82rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 25px;
+            padding: 8px 18px;
+            color: #d8cec3;
+            font-size: 0.84rem;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
 
         .category-tab-btn:hover {
             color: #f7e7b4;
             border-color: #d4af37;
-            background: rgba(212, 175, 55, 0.1);
+            background: rgba(212, 175, 55, 0.15);
+            transform: translateY(-1px);
         }
 
         .category-tab-btn.active {
@@ -187,140 +149,463 @@
             color: #120b06;
             border-color: #d4af37;
             font-weight: 700;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .category-tab-btn .badge-pill {
+            background: rgba(0, 0, 0, 0.25);
+            color: inherit;
+            border-radius: 10px;
+            padding: 2px 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .category-tab-btn.active .badge-pill {
+            background: rgba(18, 11, 6, 0.2);
+            color: #120b06;
+        }
+
+        .meal-search-box {
+            position: relative;
+            min-width: 240px;
+            flex: 0 1 280px;
+        }
+
+        .meal-search-box input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 22px;
+            padding: 9px 16px 9px 38px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .meal-search-box input:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+        }
+
+        .meal-search-box .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            color: #d4af37;
+            pointer-events: none;
+        }
+
+        /* Two-Column Interactive Layout */
+        .thali-builder-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 0.8fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Left: Dishes Browser Card */
+        .category-browser-card {
+            background: var(--dark-card);
+            border: 1px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 28px 26px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(14px);
+        }
+
+        /* States: Loading, Error, Empty */
+        .builder-state-box {
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px dashed rgba(212, 175, 55, 0.25);
+        }
+
+        .gold-ring-spinner {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 18px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spinRing 0.9s linear infinite;
+        }
+
+        @keyframes spinRing {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .builder-state-box h3 {
+            font-family: 'Cinzel', serif;
+            color: #f7e7b4;
+            font-size: 1.2rem;
+            margin: 0 0 8px;
+        }
+
+        .builder-state-box p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .builder-state-box.error-box {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .builder-state-box .state-icon {
+            font-size: 2.8rem;
+            display: block;
+            margin-bottom: 14px;
+        }
+
+        .btn-retry {
+            margin-top: 18px;
+            background: #d4af37;
+            color: #120b06;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-retry:hover {
+            background: #f7e7b4;
+            transform: translateY(-2px);
+        }
+
+        /* Category Group Sections */
+        .category-group-section {
+            margin-bottom: 34px;
+        }
+
+        .category-group-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .category-group-header h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-group-header h3 .cat-icon {
+            font-size: 1.3rem;
+        }
+
+        .category-group-header .category-count-tag {
+            font-size: 0.78rem;
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.12);
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            font-weight: 600;
         }
 
         .dishes-selection-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 18px;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
 
+        /* Compact Dish Pick Card — thumbnail + name/price + inline actions */
         .dish-pick-card {
             background: linear-gradient(145deg, rgba(32, 20, 12, 0.75), rgba(18, 11, 7, 0.95));
             border: 1px solid rgba(212, 175, 55, 0.22);
-            border-radius: 18px;
-            padding: 18px;
+            border-radius: 14px;
+            padding: 10px 12px;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.25s ease;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
             position: relative;
+            min-height: 0;
         }
 
         .dish-pick-card:hover {
             border-color: #d4af37;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.15);
+            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.12);
+        }
+
+        /* Selected state: highlight only — never enlarge image or card */
+        .dish-pick-card.in-plate {
+            border-color: #d4af37;
+            background: linear-gradient(145deg, rgba(55, 32, 16, 0.9), rgba(22, 13, 8, 0.98));
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.22);
+        }
+
+        .dish-pick-card > div:first-child {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .dish-pick-top {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 0;
         }
 
         .dish-pick-icon {
-            font-size: 2.2rem;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 72px;
+            height: 72px;
+            min-width: 72px;
+            min-height: 72px;
+            max-width: 72px;
+            max-height: 72px;
+            border-radius: 10px;
             background: rgba(212, 175, 55, 0.1);
-            display: flex;
+            display: var(--bym-dish-image-display);
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            overflow: hidden;
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .dish-pick-icon img,
+        .dish-pick-icon span {
+            width: 100%;
+            height: 100%;
+            max-width: 72px;
+            max-height: 72px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .dish-pick-icon span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .dish-pick-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .dish-pick-info h4 {
             margin: 0 0 4px;
             font-family: 'Cinzel', serif;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dish-price-category {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .dish-pick-info .price-tag {
             color: #d4af37;
             font-weight: 800;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
+        .dish-pick-info .badge-pill-card {
+            background: rgba(212, 175, 55, 0.18);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #f7e7b4;
+            font-size: 0.62rem;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Hide long descriptions to keep cards compact */
         .dish-pick-desc {
-            color: #888;
-            font-size: 0.76rem;
-            line-height: 1.5;
-            margin: 0 0 16px;
+            display: none;
+        }
+
+        /* Small inline action buttons */
+        .dish-card-actions {
+            margin-top: 0;
+            flex-shrink: 0;
+            width: auto;
         }
 
         .btn-add-dish {
-            width: 100%;
-            padding: 9px;
-            border-radius: 12px;
+            width: auto;
+            min-width: 0;
+            padding: 7px 12px;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(212, 175, 55, 0.4);
             color: #f7e7b4;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s;
-            display: flex;
+            transition: all 0.2s;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
         }
 
         .btn-add-dish:hover {
             background: #d4af37;
             color: #120b06;
             border-color: #d4af37;
+            box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
         }
 
-        .dish-pick-card.in-plate {
-            border-color: #d4af37;
-            background: linear-gradient(145deg, rgba(50, 30, 15, 0.85), rgba(22, 13, 8, 0.95));
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+        /* Quantity Control Bar — compact, not full-width */
+        .dish-qty-control {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 3px 5px;
+            gap: 4px;
+            width: auto;
         }
 
-        .dish-pick-card.in-plate .btn-add-dish {
+        .btn-qty-action {
             background: #d4af37;
             color: #120b06;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            flex-shrink: 0;
         }
 
-        /* Right Panel: Live Thali Canvas & Summary */
+        .btn-qty-action:hover {
+            background: #f7e7b4;
+        }
+
+        .btn-qty-action:active {
+            transform: scale(0.95);
+        }
+
+        .dish-qty-display {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #f7e7b4;
+            min-width: 22px;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .btn-remove-card {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            margin-left: 2px;
+            flex-shrink: 0;
+        }
+
+        .btn-remove-card:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        /* Right Panel: Live Thali Canvas & Live Bill Hub — sticky on desktop */
         .thali-summary-panel {
             background: var(--dark-card);
             border: 1px solid var(--border-gold);
             border-radius: 24px;
-            padding: 32px 28px;
+            padding: 22px 20px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(14px);
             position: sticky;
-            top: 100px;
+            top: 90px;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Thali Plate Graphic Representation */
+        /* Thali Plate Graphic — compact so bill total stays visible */
         .thali-platter-visual {
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 24px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 14px;
             border-radius: 50%;
             background: radial-gradient(circle, #3d2212 0%, #170d07 70%, #0a0503 100%);
-            border: 6px solid #d4af37;
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.35), inset 0 0 25px rgba(0, 0, 0, 0.8);
+            border: 4px solid #d4af37;
+            box-shadow: 0 0 24px rgba(212, 175, 55, 0.3), inset 0 0 18px rgba(0, 0, 0, 0.85);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .thali-platter-visual::before {
             content: '';
             position: absolute;
-            width: 85%;
-            height: 85%;
+            width: 86%;
+            height: 86%;
             border-radius: 50%;
             border: 1px dashed rgba(212, 175, 55, 0.4);
         }
@@ -328,10 +613,11 @@
         .thali-center-label {
             text-align: center;
             z-index: 1;
+            padding: 0 10px;
         }
 
         .thali-center-label .crown-icon {
-            font-size: 2rem;
+            font-size: 1.25rem;
             display: block;
             margin-bottom: 2px;
             filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
@@ -339,7 +625,7 @@
 
         .thali-center-label span {
             font-family: 'Cinzel', serif;
-            font-size: 0.82rem;
+            font-size: 0.7rem;
             color: #f7e7b4;
             font-weight: 700;
             letter-spacing: 1px;
@@ -352,65 +638,168 @@
             margin-top: 3px;
         }
 
-        /* Itemized List */
+        /* Itemized Live Bill List */
+        .plate-header-title {
+            font-family: 'Cinzel', serif;
+            color: #f7e7b4;
+            margin: 0 0 12px;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .plate-header-title span.subtitle {
+            font-size: 0.75rem;
+            color: #aaa;
+            font-family: sans-serif;
+        }
+
         .plate-items-container {
-            max-height: 220px;
+            max-height: 180px;
             overflow-y: auto;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             padding-right: 6px;
             scrollbar-width: thin;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+        .plate-items-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .plate-items-container::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
         }
 
         .plate-item-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(212, 175, 55, 0.15);
+            flex-direction: column;
+            padding: 11px 12px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.18);
             border-radius: 12px;
             margin-bottom: 8px;
+            gap: 7px;
             animation: fadeInItem 0.25s ease-out;
         }
 
         @keyframes fadeInItem {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .plate-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .plate-item-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
         }
 
+        /* Bill list thumbnails MUST stay tiny — unconstrained <img> was blowing up layout */
         .plate-item-left .icon {
-            font-size: 1.25rem;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            max-width: 36px;
+            max-height: 36px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: var(--bym-dish-image-display);
+            align-items: center;
+            justify-content: center;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .plate-item-left .icon img,
+        .plate-item-left .icon span {
+            width: 100%;
+            height: 100%;
+            max-width: 36px;
+            max-height: 36px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .plate-item-left .icon span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
         }
 
         .plate-item-name {
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .plate-item-right {
+        .plate-item-actions-top {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
-        .plate-item-price {
-            font-weight: 700;
-            color: #d4af37;
-            font-size: 0.88rem;
+        .btn-qty-sm {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #f7e7b4;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-qty-sm:hover {
+            background: #d4af37;
+            color: #120b06;
+        }
+
+        .qty-sm-count {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #fff;
+            min-width: 18px;
+            text-align: center;
         }
 
         .btn-remove-item {
             background: none;
             border: none;
-            color: #888;
-            font-size: 1.1rem;
+            color: #777;
+            font-size: 1rem;
             cursor: pointer;
             transition: color 0.2s;
             padding: 0 4px;
@@ -420,20 +809,55 @@
             color: #ef4444;
         }
 
+        /* Live Math Line: Name x Qty = Amount */
+        .plate-item-math-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 6px;
+            border-top: 1px dashed rgba(212, 175, 55, 0.15);
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .plate-item-equation {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: monospace, sans-serif;
+        }
+
+        .plate-item-equation .eq-unit {
+            color: #d4af37;
+        }
+
+        .plate-item-equation .eq-qty {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .plate-item-equation .eq-amount {
+            color: #f7e7b4;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
         .empty-thali-msg {
             text-align: center;
             padding: 25px 15px;
             color: #777;
             font-size: 0.85rem;
+            line-height: 1.6;
         }
 
-        /* Bill Calculation Box */
+        /* Bill Calculation Box — total stays prominent */
         .bill-calculation-box {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
-            padding: 18px 20px;
+            padding: 14px 16px 16px;
             border: 1px solid rgba(212, 175, 55, 0.2);
-            margin-bottom: 22px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
         }
 
         .bill-line-row {
@@ -445,38 +869,50 @@
             margin-bottom: 8px;
         }
 
+        .bill-line-row span.val {
+            font-weight: 700;
+            color: #e5ded7;
+        }
+
         .bill-total-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid rgba(212, 175, 55, 0.25);
-            padding-top: 12px;
-            margin-top: 10px;
+            gap: 12px;
+            margin-top: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(212, 175, 55, 0.55);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(120, 53, 15, 0.35));
+            box-shadow: 0 0 22px rgba(212, 175, 55, 0.2);
         }
 
         .bill-total-row span.label {
             font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
+            letter-spacing: 0.3px;
         }
 
         .bill-total-row span.amount {
             font-family: 'Cinzel', serif;
-            font-size: 1.55rem;
+            font-size: clamp(1.75rem, 2.4vw, 2rem); /* 28–32px */
             font-weight: 800;
-            color: #d4af37;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            color: #f7e7b4;
+            text-shadow: 0 0 18px rgba(212, 175, 55, 0.55);
+            line-height: 1.1;
+            white-space: nowrap;
         }
 
         /* Action Buttons */
         .btn-order-thali {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: linear-gradient(135deg, #d4af37, #9b722b);
             color: #120b06;
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -490,6 +926,7 @@
             justify-content: center;
             gap: 8px;
             margin-bottom: 10px;
+            flex-shrink: 0;
         }
 
         .btn-order-thali:hover {
@@ -508,10 +945,15 @@
             font-size: 0.82rem;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
         .btn-clear-thali:hover {
-            color: #fff;
+            color: #fca5a5;
             border-color: rgba(239, 68, 68, 0.4);
             background: rgba(239, 68, 68, 0.1);
         }
@@ -536,8 +978,8 @@
             background: linear-gradient(145deg, #22140c, #100a06);
             border: 1px solid var(--border-gold);
             border-radius: 24px;
-            padding: 35px 32px;
-            max-width: 480px;
+            padding: 35px 30px;
+            max-width: 490px;
             width: 100%;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
             text-align: center;
@@ -546,8 +988,15 @@
         }
 
         @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.92); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .modal-card h3 {
@@ -571,7 +1020,7 @@
             margin-bottom: 22px;
             text-align: left;
             border: 1px dashed rgba(212, 175, 55, 0.3);
-            max-height: 180px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
@@ -592,458 +1041,968 @@
             background: #f7e7b4;
         }
 
-        /* Responsive */
+        /* Mobile sticky bar — count + total, tappable to open full bill */
+        .mobile-floating-platter-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #2a1a0f, #140b07);
+            border-top: 2px solid #d4af37;
+            border-radius: 18px 18px 0 0;
+            padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            animation: slideUpBar 0.3s ease-out;
+        }
+
+        @keyframes slideUpBar {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .mobile-platter-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .mobile-platter-info .m-count {
+            font-size: 0.78rem;
+            color: #bfaea2;
+        }
+
+        .mobile-platter-info .m-total {
+            font-family: 'Cinzel', serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #f7e7b4;
+            line-height: 1.15;
+        }
+
+        .btn-mobile-view-bill {
+            background: #d4af37;
+            color: #120b06;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            pointer-events: none; /* whole bar is tappable */
+        }
+
+        /* Tablet / stacked layout */
         @media (max-width: 992px) {
             .thali-builder-grid {
                 grid-template-columns: 1fr;
+                gap: 26px;
             }
+
             .thali-summary-panel {
                 position: static;
-                order: -1; /* Place summary and plate on top for mobile */
+                max-height: none;
+                overflow: visible;
+            }
+        }
+
+        /* Mobile (<768px): sticky bottom bill bar */
+        @media (max-width: 767px) {
+            #meal-page-wrapper {
+                padding: 95px 4% 110px;
+            }
+
+            .category-browser-card,
+            .thali-summary-panel {
+                padding: 18px 14px;
+                border-radius: 18px;
+            }
+
+            .dishes-selection-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .dish-pick-icon {
+                width: 64px;
+                height: 64px;
+                min-width: 64px;
+                min-height: 64px;
+                max-width: 64px;
+                max-height: 64px;
+            }
+
+            .dish-pick-icon img,
+            .dish-pick-icon span {
+                max-width: 64px;
+                max-height: 64px;
+            }
+
+            .thali-platter-visual {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 12px;
+            }
+
+            .thali-center-label .crown-icon {
+                font-size: 1.1rem;
+            }
+
+            .bill-total-row span.amount {
+                font-size: 1.75rem; /* 28px */
+            }
+
+            .meal-controls-bar {
+                padding: 12px 14px;
+            }
+
+            .meal-search-box {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+
+            .mobile-floating-platter-bar.active {
+                display: flex;
             }
         }
     </style>
 </head>
 
+<!-- Add class "bym-hide-images" on body to hide dish thumbnails (name + price only). -->
 <body>
 
-<!-- ========================================================
+    <!-- ========================================================
      NAVIGATION BAR
 ======================================================== -->
-<header>
-    <nav class="navbar">
-        <a href="index.html" class="brand">
-            <img src="./logo.jpeg" alt="Hotel Vahinisaheb">
-            <div class="brand-text">
-                <h3>Hotel Vahinisaheb</h3>
-                <p>Authentic Maharashtrian Taste</p>
+    <header>
+        <nav class="navbar">
+            <a href="index.html" class="brand">
+                <img src="./logo.jpeg" alt="Hotel Vahinisaheb">
+                <div class="brand-text">
+                    <h3>Hotel Vahinisaheb</h3>
+                    <p>Authentic Maharashtrian Taste</p>
+                </div>
+            </a>
+
+            <div class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
+                ☰
             </div>
-        </a>
 
-        <div class="menu-toggle" onclick="toggleMenu()">
-            ☰
-        </div>
-
-        <ul class="nav-links" id="navLinks">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="menu.html">Menu</a></li>
-            <li><a class="active" href="build-your-meal.html">Build Your Meal</a></li>
-            <li><a href="ai-recommendation.html">AI Recommendation</a></li>
-            <li><a href="gallery.html">Gallery</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="reviews.html">Reviews</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="admin-login.html">🔐 Admin</a></li>
-        </ul>
-    </nav>
-</header>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="menu.html">Menu</a></li>
+                <li><a class="active" href="build-your-meal.html">Build Your Meal</a></li>
+                <li><a href="ai-recommendation.html">AI Recommendation</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin-login.html">🔐 Admin</a></li>
+            </ul>
+        </nav>
+    </header>
 
 
-<!-- ========================================================
+    <!-- ========================================================
      BUILD YOUR MEAL MAIN CONTENT
 ======================================================== -->
-<main id="meal-page-wrapper">
+    <main id="meal-page-wrapper">
 
-    <!-- Hero Header -->
-    <div class="meal-hero-header">
-        <div class="meal-badge">
-            <span>👑 Interactive Culinary Workshop</span>
+        <!-- Hero Header -->
+        <div class="meal-hero-header">
+            <div class="meal-badge">
+                <span>👑 Interactive Culinary Workshop</span>
+            </div>
+            <h1>Build Your Royal <span>Maharashtrian Thali</span></h1>
+            <p>
+                Customize your feast just the way you like! Choose your signature curries, rustic breads, drinks, and
+                accompaniments fresh from our live kitchen menu. Watch your royal platter calculate and assemble in real
+                time.
+            </p>
         </div>
-        <h1>Build Your Royal <span>Maharashtrian Thali</span></h1>
-        <p>
-            Customize your feast just the way you like! Choose your signature curries, rustic breads, steamed rice, digestifs, and festive sweets. Watch your royal platter assemble in real time.
-        </p>
-    </div>
 
-    <!-- 1-Click Signature Preset Combinations -->
-    <div class="preset-strip-wrapper">
-        <div class="preset-strip-title">
-            <span>⚡ Quick 1-Click Chef Combos:</span>
-        </div>
-        <div class="preset-buttons-group">
-            <button type="button" class="btn-preset" onclick="loadThaliPreset('mutton')">
-                <span>🍗 Kolhapuri Mutton Feast</span>
-            </button>
-            <button type="button" class="btn-preset" onclick="loadThaliPreset('veg_royal')">
-                <span>🍛 Royal Maharashtrian Thali</span>
-            </button>
-            <button type="button" class="btn-preset" onclick="loadThaliPreset('pithla')">
-                <span>🫓 Rustic Pithla Bhakri</span>
-            </button>
-        </div>
-    </div>
-
-
-    <!-- Two-Column Interactive Layout -->
-    <div class="thali-builder-grid">
-
-        <!-- Left: Category Item Browser -->
-        <div class="category-browser-card">
-            
-            <!-- Category Tabs -->
-            <div class="category-nav-tabs">
-                <button type="button" class="category-tab-btn active" onclick="switchCategory('mains', this)">
-                    <span>🍲 Main Curries</span>
+        <!-- Controls Strip: Category Filter Tabs & Real-time Search -->
+        <div class="meal-controls-bar">
+            <div class="category-nav-tabs" id="categoryNavTabs">
+                <button type="button" class="category-tab-btn active" onclick="filterByCategory('all', this)">
+                    <span>🍽️ All Dishes</span>
+                    <span class="badge-pill" id="badge-count-all">0</span>
                 </button>
-                <button type="button" class="category-tab-btn" onclick="switchCategory('breads', this)">
-                    <span>🫓 Traditional Breads</span>
+                <button type="button" class="category-tab-btn" onclick="filterByCategory('veg', this)">
+                    <span>🥗 Pure Veg</span>
+                    <span class="badge-pill" id="badge-count-veg">0</span>
                 </button>
-                <button type="button" class="category-tab-btn" onclick="switchCategory('rice', this)">
-                    <span>🍚 Rice & Staples</span>
+                <button type="button" class="category-tab-btn" onclick="filterByCategory('nonveg', this)">
+                    <span>🍗 Non-Veg</span>
+                    <span class="badge-pill" id="badge-count-nonveg">0</span>
                 </button>
-                <button type="button" class="category-tab-btn" onclick="switchCategory('drinks', this)">
-                    <span>🥛 Drinks & Digestifs</span>
+                <button type="button" class="category-tab-btn" onclick="filterByCategory('breads', this)">
+                    <span>🫓 Breads</span>
+                    <span class="badge-pill" id="badge-count-breads">0</span>
                 </button>
-                <button type="button" class="category-tab-btn" onclick="switchCategory('sweets', this)">
-                    <span>🍯 Sweets & Desserts</span>
+                <button type="button" class="category-tab-btn" onclick="filterByCategory('drinks', this)">
+                    <span>🥛 Beverages</span>
+                    <span class="badge-pill" id="badge-count-drinks">0</span>
                 </button>
             </div>
 
-            <!-- Dishes Grid -->
-            <div class="dishes-selection-grid" id="dishesGridContainer">
-                <!-- Rendered dynamically via JavaScript -->
+            <div class="meal-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="dishSearchInput" placeholder="Search dish name..."
+                    oninput="onSearchInput(this.value)">
+            </div>
+        </div>
+
+
+        <!-- Two-Column Interactive Layout -->
+        <div class="thali-builder-grid">
+
+            <!-- Left: Category Item Browser -->
+            <div class="category-browser-card">
+
+                <!-- Loading State -->
+                <div class="builder-state-box" id="dishesLoadingState">
+                    <div class="gold-ring-spinner"></div>
+                    <h3>Fetching Authentic Menu...</h3>
+                    <p>Loading dishes live from the kitchen backend (/api/menu)...</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="builder-state-box error-box" id="dishesErrorState" style="display: none;">
+                    <span class="state-icon">⚠️</span>
+                    <h3>Unable to Load Menu Dishes</h3>
+                    <p id="dishesErrorMessage">Could not connect to the menu service. Please check your backend
+                        connection.</p>
+                    <button type="button" class="btn-retry" onclick="fetchMenuDishes()">
+                        <span>🔄 Retry Connection</span>
+                    </button>
+                </div>
+
+                <!-- Empty Menu State -->
+                <div class="builder-state-box" id="dishesEmptyState" style="display: none;">
+                    <span class="state-icon">🍽️</span>
+                    <h3>No Dishes Available</h3>
+                    <p>No dishes are currently listed in the menu.</p>
+                </div>
+
+                <!-- Dynamic Dishes Container (Grouped by Category) -->
+                <div id="dishesContainer" style="display: none;">
+                    <!-- Dynamically rendered via JavaScript -->
+                </div>
+
             </div>
 
-        </div>
 
+            <!-- Right: Visual Thali Platter & Live Order Bill Hub -->
+            <div class="thali-summary-panel" id="thaliSummaryPanel">
 
-        <!-- Right: Visual Thali Platter & Order Bill Hub -->
-        <div class="thali-summary-panel">
-            
-            <!-- Silver Thali Visual Platter -->
-            <div class="thali-platter-visual">
-                <div class="thali-center-label">
-                    <span class="crown-icon">👑</span>
-                    <span>Royal Thali</span>
-                    <div class="thali-items-counter-badge" id="thaliItemCountText">0 Items Selected</div>
-                </div>
-            </div>
-
-            <!-- Itemized List -->
-            <h4 style="font-family:'Cinzel',serif; color:#f7e7b4; margin:0 0 12px; font-size:1.1rem; display:flex; justify-content:space-between; align-items:center;">
-                <span>Platter Contents</span>
-                <span style="font-size:0.75rem; color:#aaa; font-family:sans-serif;" id="plateSummarySubtitle">Empty Plate</span>
-            </h4>
-
-            <div class="plate-items-container" id="plateItemsContainer">
-                <div class="empty-thali-msg">
-                    Tap dishes on the left to add items to your royal thali!
-                </div>
-            </div>
-
-            <!-- Bill Calculation Box -->
-            <div class="bill-calculation-box">
-                <div class="bill-line-row">
-                    <span>Dishes Subtotal</span>
-                    <span id="billSubtotal">₹0.00</span>
-                </div>
-                <div class="bill-line-row">
-                    <span>Dining Tax & Service</span>
-                    <span style="color:#86efac;">Included</span>
-                </div>
-                <div class="bill-total-row">
-                    <span class="label">Total Amount:</span>
-                    <span class="amount" id="billTotalAmount">₹0.00</span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <button type="button" class="btn-order-thali" onclick="openOrderModal()">
-                <span>🍽️ Order This Custom Feast</span>
-                <span>→</span>
-            </button>
-
-            <button type="button" class="btn-clear-thali" onclick="clearThali()">
-                <span>🔄 Reset / Clear Platter</span>
-            </button>
-
-        </div>
-
-    </div>
-
-</main>
-
-
-<!-- ========================================================
-     ORDER CONFIRMATION MODAL
-======================================================== -->
-<div class="modal-overlay" id="orderModalOverlay">
-    <div class="modal-card">
-        <span style="font-size:3rem;">👑</span>
-        <h3>Custom Thali Prepared!</h3>
-        <p>Your authentic Maharashtrian feast combination has been customized.</p>
-        
-        <div class="modal-receipt-summary" id="modalReceiptSummary">
-            <!-- Dynamically populated -->
-        </div>
-
-        <button type="button" class="btn-close-modal" onclick="closeOrderModal()">
-            Done / Close
-        </button>
-    </div>
-</div>
-
-
-<!-- ========================================================
-     FOOTER
-======================================================== -->
-<footer>
-    <div class="footer-grid">
-        <div>
-            <h3>Hotel Vahinisaheb</h3>
-            <p>महाराष्ट्राच्या चवीचा खरा आस्वाद.</p>
-            <p>Authentic Maharashtrian food, prepared with tradition and warmth.</p>
-        </div>
-
-        <div>
-            <h3>Quick Links</h3>
-            <a href="index.html">Home</a>
-            <a href="menu.html">Menu</a>
-            <a href="build-your-meal.html">Build Your Meal</a>
-            <a href="ai-recommendation.html">AI Recommendation</a>
-            <a href="gallery.html">Gallery</a>
-        </div>
-
-        <div>
-            <h3>Connect</h3>
-            <a href="about.html">About Us</a>
-            <a href="reviews.html">Customer Reviews</a>
-            <a href="contact.html">Contact & Location</a>
-            <a href="admin-login.html" style="color:#d4af37;font-weight:600;">🔐 Admin Portal</a>
-        </div>
-    </div>
-
-    <div class="copyright">
-        © 2026 Hotel Vahinisaheb. All Rights Reserved.
-    </div>
-</footer>
-
-
-<!-- Scripts -->
-<script src="script.js"></script>
-
-<script>
-// ==========================================
-// CULINARY DATABASE FOR THALI BUILDER
-// ==========================================
-const MEAL_CATALOG = {
-    mains: [
-        { id: "m1", name: "Maharashtrian Thali", icon: "🍛", price: 280, desc: "Grand multi-curry royal combination" },
-        { id: "m2", name: "Kolhapuri Mutton Rassa", icon: "🍗", price: 320, desc: "Slow-cooked fiery tambda & pandhra rassa" },
-        { id: "m3", name: "Chicken Masala", icon: "🍗", price: 260, desc: "Tender chicken in roasted rustic spices" },
-        { id: "m4", name: "Bharli Vangi", icon: "🍆", price: 190, desc: "Stuffed baby eggplants with peanut masala" },
-        { id: "m5", name: "Chulivarcha Pithla", icon: "🫓", price: 160, desc: "Traditional gram flour curry with garlic" },
-        { id: "m6", name: "Paneer Kolhapuri", icon: "🧀", price: 210, desc: "Fresh cottage cheese in zesty red gravy" }
-    ],
-    breads: [
-        { id: "b1", name: "Jowar Bhakri", icon: "🫓", price: 50, desc: "Freshly roasted sorghum flatbread" },
-        { id: "b2", name: "Bajra Bhakri", icon: "🫓", price: 50, desc: "Warm rustic pearl millet bread" },
-        { id: "b3", name: "Tawa Chapati", icon: "🫓", price: 30, desc: "Soft whole wheat phulka" },
-        { id: "b4", name: "Butter Naan", icon: "🫓", price: 45, desc: "Char-grilled clay oven bread with butter" }
-    ],
-    rice: [
-        { id: "r1", name: "Steamed Basmati Rice", icon: "🍚", price: 90, desc: "Aromatic long-grain white rice" },
-        { id: "r2", name: "Jeera Rice", icon: "🍚", price: 120, desc: "Tempered cumin seeds with pure ghee" },
-        { id: "r3", name: "Maharashtrian Dal Khichdi", icon: "🍲", price: 140, desc: "Comforting lentils & rice with spices" }
-    ],
-    drinks: [
-        { id: "d1", name: "Spiced Taak (Buttermilk)", icon: "🥛", price: 40, desc: "Chilled buttermilk with mustard & coriander" },
-        { id: "d2", name: "Konkani Solkadhi", icon: "🍷", price: 60, desc: "Pink kokum digestif with coconut milk" },
-        { id: "d3", name: "Kesar Mango Lassi", icon: "🥭", price: 70, desc: "Thick creamy yogurt drink infused with saffron" }
-    ],
-    sweets: [
-        { id: "s1", name: "Puran Poli with Ghee", icon: "🥞", price: 120, desc: "Sweet lentil stuffed flatbread with desi ghee" },
-        { id: "s2", name: "Kesar Shrikhand", icon: "🍯", price: 100, desc: "Silky strained yogurt sweetened with cardamom" },
-        { id: "s3", name: "Hot Gulab Jamun", icon: "🟤", price: 80, desc: "Melt-in-mouth milk dumplings in rose syrup" }
-    ]
-};
-
-// State: Selected items map: { id: { ...dish, qty: 1 } }
-let selectedPlateItems = {};
-let currentCategory = 'mains';
-
-function switchCategory(catKey, btn) {
-    currentCategory = catKey;
-    document.querySelectorAll('.category-tab-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    renderCategoryDishes();
-}
-
-function renderCategoryDishes() {
-    const container = document.getElementById("dishesGridContainer");
-    if (!container) return;
-
-    const items = MEAL_CATALOG[currentCategory] || [];
-    container.innerHTML = "";
-
-    items.forEach(item => {
-        const isInPlate = !!selectedPlateItems[item.id];
-        const card = document.createElement("div");
-        card.className = `dish-pick-card ${isInPlate ? 'in-plate' : ''}`;
-        card.id = `card-${item.id}`;
-
-        card.innerHTML = `
-            <div>
-                <div class="dish-pick-top">
-                    <div class="dish-pick-icon">${item.icon}</div>
-                    <div class="dish-pick-info">
-                        <h4>${item.name}</h4>
-                        <span class="price-tag">₹${item.price}.00</span>
+                <!-- Silver Thali Visual Platter -->
+                <div class="thali-platter-visual" id="thaliPlatterVisual">
+                    <div class="thali-center-label">
+                        <span class="crown-icon">👑</span>
+                        <span>Royal Thali</span>
+                        <div class="thali-items-counter-badge" id="thaliItemCountText">Empty Platter</div>
                     </div>
                 </div>
-                <p class="dish-pick-desc">${item.desc}</p>
+
+                <!-- Itemized Live Bill List -->
+                <div class="plate-header-title">
+                    <span>Platter Contents</span>
+                    <span class="subtitle" id="plateSummarySubtitle">0 items selected</span>
+                </div>
+
+                <div class="plate-items-container" id="plateItemsContainer">
+                    <div class="empty-thali-msg">
+                        Tap dishes on the left to add items to your royal thali!
+                    </div>
+                </div>
+
+                <!-- Bill Calculation Box -->
+                <div class="bill-calculation-box">
+                    <div class="bill-line-row">
+                        <span>Dishes Subtotal</span>
+                        <span class="val" id="billSubtotal">₹0.00</span>
+                    </div>
+                    <div class="bill-line-row">
+                        <span>Dining Tax & Service</span>
+                        <span style="color:#86efac; font-weight:700;">Included</span>
+                    </div>
+                    <div class="bill-total-row">
+                        <span class="label">Total Amount:</span>
+                        <span class="amount" id="billTotalAmount">₹0.00</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <button type="button" class="btn-order-thali" onclick="openOrderModal()">
+                    <span>🍽️ Order This Custom Feast</span>
+                    <span>→</span>
+                </button>
+
+                <button type="button" class="btn-clear-thali" id="clearSelectionBtn" onclick="clearSelection()">
+                    <span>🗑️ Clear selection</span>
+                </button>
+
             </div>
-            <button type="button" class="btn-add-dish" onclick="togglePlateItem('${item.id}', '${currentCategory}')">
-                <span>${isInPlate ? '✓ Added to Plate' : '➕ Add to Thali'}</span>
+
+        </div>
+
+    </main>
+
+
+    <!-- Mobile sticky bill bar (<768px) — tap anywhere to scroll to full bill -->
+    <div class="mobile-floating-platter-bar" id="mobileFloatingBar"
+        role="button" tabindex="0" aria-label="View platter and total"
+        onclick="scrollToSummary()"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();scrollToSummary();}">
+        <div class="mobile-platter-info">
+            <span class="m-count" id="mobileBarCount">0 Items</span>
+            <span class="m-total" id="mobileBarTotal">₹0.00</span>
+        </div>
+        <span class="btn-mobile-view-bill">
+            <span>View Bill 📋</span>
+        </span>
+    </div>
+
+
+    <!-- ========================================================
+     ORDER CONFIRMATION MODAL
+======================================================== -->
+    <div class="modal-overlay" id="orderModalOverlay" onclick="handleModalOverlayClick(event)">
+        <div class="modal-card">
+            <span style="font-size:3rem; display:block; margin-bottom:6px;">👑</span>
+            <h3>Custom Thali Prepared!</h3>
+            <p>Your authentic Maharashtrian feast combination has been customized.</p>
+
+            <div class="modal-receipt-summary" id="modalReceiptSummary">
+                <!-- Dynamically populated -->
+            </div>
+
+            <button type="button" class="btn-close-modal" onclick="closeOrderModal()">
+                Done / Close
             </button>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+     FOOTER
+======================================================== -->
+    <footer>
+        <div class="footer-grid">
+            <div>
+                <h3>Hotel Vahinisaheb</h3>
+                <p>महाराष्ट्राच्या चवीचा खरा आस्वाद.</p>
+                <p>Authentic Maharashtrian food, prepared with tradition and warmth.</p>
+            </div>
+
+            <div>
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="menu.html">Menu</a>
+                <a href="build-your-meal.html">Build Your Meal</a>
+                <a href="ai-recommendation.html">AI Recommendation</a>
+                <a href="gallery.html">Gallery</a>
+            </div>
+
+            <div>
+                <h3>Connect</h3>
+                <a href="about.html">About Us</a>
+                <a href="reviews.html">Customer Reviews</a>
+                <a href="contact.html">Contact & Location</a>
+                <a href="admin-login.html" style="color:#d4af37;font-weight:600;">🔐 Admin Portal</a>
+            </div>
+        </div>
+
+        <div class="copyright">
+            © 2026 Hotel Vahinisaheb. All Rights Reserved.
+        </div>
+    </footer>
+
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+
+    <script>
+        // ============================================================
+        // DYNAMIC BUILD-YOUR-MEAL CONTROLLER (CONNECTED TO /api/menu)
+        // ============================================================
+
+        // State
+        let allMenuDishes = [];
+        let selectedDishes = {}; // { [dishId]: { dish: object, qty: number } }
+        let bymActiveCategory = 'all';
+        let bymSearchQuery = '';
+
+        // Category Configuration
+        const CATEGORY_CONFIG = {
+            veg: {
+                key: 'veg',
+                title: 'Pure Vegetarian Delicacies',
+                icon: '🥗',
+                subtitle: 'Authentic vegetarian curries & preparations'
+            },
+            nonveg: {
+                key: 'nonveg',
+                title: 'Non-Vegetarian Specialities',
+                icon: '🍗',
+                subtitle: 'Slow cooked spicy rassa & signature meats'
+            },
+            breads: {
+                key: 'breads',
+                title: 'Traditional Breads & Bhakri',
+                icon: '🫓',
+                subtitle: 'Warm chulivarcha bhakri & soft phulkas'
+            },
+            drinks: {
+                key: 'drinks',
+                title: 'Refreshing Drinks & Digestifs',
+                icon: '🥛',
+                subtitle: 'Chilled taak, solkadhi & cool beverages'
+            }
+        };
+
+        /**
+         * Normalizes category strings from database
+         */
+        function normalizeCategoryKey(rawCategory) {
+            const cat = String(rawCategory || '').toLowerCase().trim();
+            if (cat.includes('nonveg') || cat.includes('non-veg') || cat.includes('non veg')) {
+                return 'nonveg';
+            }
+            if (cat.includes('bread') || cat.includes('roti') || cat.includes('bhakri') || cat.includes('naan')) {
+                return 'breads';
+            }
+            if (cat.includes('drink') || cat.includes('beverage') || cat.includes('taak') || cat.includes('solkadhi') || cat.includes('lassi')) {
+                return 'drinks';
+            }
+            if (cat.includes('veg')) {
+                return 'veg';
+            }
+            return cat || 'veg';
+        }
+
+        /**
+         * Safely parses price whether stored as Number, String, or with currency symbols (e.g. "₹250", "280.00")
+         */
+        function parsePrice(rawPrice) {
+            if (typeof rawPrice === 'number') {
+                return isFinite(rawPrice) ? rawPrice : 0;
+            }
+            if (!rawPrice) return 0;
+            const str = String(rawPrice).trim().replace(/,/g, '');
+            const cleaned = str.replace(/[^0-9.-]/g, '');
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        /**
+         * Formats a number to currency format (₹0.00)
+         */
+        function formatCurrency(amount) {
+            const num = parsePrice(amount);
+            return '₹' + num.toFixed(2);
+        }
+
+        /**
+         * HTML Escaper
+         */
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /**
+         * Renders appropriate image or emoji for a dish
+         */
+        function renderDishVisual(dish) {
+            const img = dish.image;
+            if (img && (img.startsWith('data:image/') || img.startsWith('http') || img.startsWith('/') || img.startsWith('.'))) {
+                return `<img src="${escapeHtml(img)}" alt="${escapeHtml(dish.name)}" loading="lazy" />`;
+            }
+            if (img && img.trim().length > 0) {
+                return `<span style="font-size:2rem;">${escapeHtml(img)}</span>`;
+            }
+            const cat = normalizeCategoryKey(dish.category);
+            const fallbackEmoji = cat === 'nonveg' ? '🍗' : (cat === 'breads' ? '🫓' : (cat === 'drinks' ? '🥛' : '🍛'));
+            return `<span style="font-size:2rem;">${fallbackEmoji}</span>`;
+        }
+
+        /**
+         * Fetch menu items from existing /api/menu backend endpoint
+         */
+        async function fetchMenuDishes() {
+            const loadingState = document.getElementById('dishesLoadingState');
+            const errorState = document.getElementById('dishesErrorState');
+            const emptyState = document.getElementById('dishesEmptyState');
+            const container = document.getElementById('dishesContainer');
+
+            loadingState.style.display = 'block';
+            errorState.style.display = 'none';
+            emptyState.style.display = 'none';
+            container.style.display = 'none';
+
+            try {
+                let response;
+                if (typeof fetchApi === 'function') {
+                    response = await fetchApi('/api/menu');
+                } else {
+                    response = await fetch('/api/menu');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Server returned HTTP status ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (!Array.isArray(data)) {
+                    throw new Error('Received unexpected data structure from backend menu API');
+                }
+
+                allMenuDishes = data;
+                loadingState.style.display = 'none';
+
+                if (allMenuDishes.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                updateCategoryPillCounts();
+                renderAllDishes();
+                container.style.display = 'block';
+                updateBillUI();
+            } catch (err) {
+                console.error('Failed to load menu dishes:', err);
+                loadingState.style.display = 'none';
+                document.getElementById('dishesErrorMessage').textContent =
+                    `Could not load dishes from backend (/api/menu): ${err.message}. Please verify the server is running on port 5000.`;
+                errorState.style.display = 'block';
+            }
+        }
+
+        /**
+         * Updates count badges on category tabs
+         */
+        function updateCategoryPillCounts() {
+            const counts = { all: allMenuDishes.length, veg: 0, nonveg: 0, breads: 0, drinks: 0 };
+            allMenuDishes.forEach(dish => {
+                const cat = normalizeCategoryKey(dish.category);
+                if (counts[cat] !== undefined) {
+                    counts[cat]++;
+                } else {
+                    counts[cat] = (counts[cat] || 0) + 1;
+                }
+            });
+
+            ['all', 'veg', 'nonveg', 'breads', 'drinks'].forEach(key => {
+                const el = document.getElementById(`badge-count-${key}`);
+                if (el) el.textContent = counts[key] || 0;
+            });
+        }
+
+        /**
+         * Filter by Category Tab
+         */
+        function filterByCategory(categoryKey, btn) {
+            bymActiveCategory = categoryKey;
+            document.querySelectorAll('.category-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderAllDishes();
+        }
+
+        /**
+         * Filter by Search Input
+         */
+        function onSearchInput(query) {
+            bymSearchQuery = (query || '').toLowerCase().trim();
+            renderAllDishes();
+        }
+
+        /**
+         * Renders all dishes grouped by category (veg, nonveg, breads, drinks)
+         */
+        function renderAllDishes() {
+            const container = document.getElementById('dishesContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Filter dishes by search query first
+            const filteredDishes = allMenuDishes.filter(dish => {
+                if (!bymSearchQuery) return true;
+                const name = (dish.name || '').toLowerCase();
+                const desc = (dish.description || '').toLowerCase();
+                return name.includes(bymSearchQuery) || desc.includes(bymSearchQuery);
+            });
+
+            // Collect standard categories and any extra categories present
+            const standardCategories = ['veg', 'nonveg', 'breads', 'drinks'];
+            const otherCategories = [];
+            allMenuDishes.forEach(d => {
+                const cat = normalizeCategoryKey(d.category);
+                if (!standardCategories.includes(cat) && !otherCategories.includes(cat)) {
+                    otherCategories.push(cat);
+                }
+            });
+
+            // Determine which categories to display
+            const targetCategories = bymActiveCategory === 'all'
+                ? [...standardCategories, ...otherCategories]
+                : [bymActiveCategory];
+
+            let totalRenderedDishes = 0;
+
+            targetCategories.forEach(catKey => {
+                const catDishes = filteredDishes.filter(d => normalizeCategoryKey(d.category) === catKey);
+
+                if (catDishes.length === 0) return;
+
+                totalRenderedDishes += catDishes.length;
+                const config = CATEGORY_CONFIG[catKey] || {
+                    title: catKey.toUpperCase(),
+                    icon: '🍲',
+                    subtitle: 'Curated culinary selections'
+                };
+
+                const section = document.createElement('div');
+                section.className = 'category-group-section';
+                section.id = `cat-group-${catKey}`;
+
+                section.innerHTML = `
+            <div class="category-group-header">
+                <h3>
+                    <span class="cat-icon">${config.icon}</span>
+                    <span>${config.title}</span>
+                </h3>
+                <span class="category-count-tag">${catDishes.length} dish${catDishes.length !== 1 ? 'es' : ''}</span>
+            </div>
+            <div class="dishes-selection-grid" id="grid-${catKey}"></div>
         `;
 
-        container.appendChild(card);
-    });
-}
+                const grid = section.querySelector(`#grid-${catKey}`);
 
-function togglePlateItem(itemId, categoryKey) {
-    if (selectedPlateItems[itemId]) {
-        delete selectedPlateItems[itemId];
-    } else {
-        const dish = MEAL_CATALOG[categoryKey].find(d => d.id === itemId);
-        if (dish) {
-            selectedPlateItems[itemId] = { ...dish, qty: 1 };
+                catDishes.forEach(dish => {
+                    const dishId = String(dish.id || dish._id);
+                    const inPlateItem = selectedDishes[dishId];
+                    const isAdded = !!inPlateItem && inPlateItem.qty > 0;
+                    const currentQty = isAdded ? inPlateItem.qty : 0;
+                    const priceNum = parsePrice(dish.price);
+
+                    const card = document.createElement('div');
+                    card.className = `dish-pick-card ${isAdded ? 'in-plate' : ''}`;
+                    card.id = `dish-card-${dishId}`;
+
+                    const badgeHtml = dish.badge
+                        ? `<span class="badge-pill-card">${escapeHtml(dish.badge)}</span>`
+                        : '';
+
+                    const descText = dish.description ? escapeHtml(dish.description) : 'Freshly prepared authentic Maharashtrian recipe.';
+
+                    card.innerHTML = `
+                <div>
+                    <div class="dish-pick-top">
+                        <div class="dish-pick-icon">${renderDishVisual(dish)}</div>
+                        <div class="dish-pick-info">
+                            <h4>${escapeHtml(dish.name)}</h4>
+                            <div class="dish-price-category">
+                                <span class="price-tag">${formatCurrency(priceNum)}</span>
+                                ${badgeHtml}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="dish-pick-desc">${descText}</p>
+                </div>
+                <div class="dish-card-actions" id="actions-${dishId}">
+                    ${renderCardActionButtons(dishId, currentQty)}
+                </div>
+            `;
+
+                    grid.appendChild(card);
+                });
+
+                container.appendChild(section);
+            });
+
+            if (totalRenderedDishes === 0) {
+                container.innerHTML = `
+            <div class="builder-state-box">
+                <span class="state-icon">🔍</span>
+                <h3>No Dishes Found</h3>
+                <p>No dishes match "${escapeHtml(bymSearchQuery)}". Try adjusting your search or category filter.</p>
+            </div>
+        `;
+            }
         }
-    }
 
-    updatePlateUI();
-    renderCategoryDishes();
-}
+        /**
+         * Returns HTML string for Add or Quantity Control button
+         */
+        function renderCardActionButtons(dishId, qty) {
+            if (qty > 0) {
+                return `
+            <div class="dish-qty-control">
+                <button type="button" class="btn-qty-action" onclick="changeDishQty('${dishId}', -1)" aria-label="Decrease quantity">−</button>
+                <span class="dish-qty-display">${qty}</span>
+                <button type="button" class="btn-qty-action" onclick="changeDishQty('${dishId}', 1)" aria-label="Increase quantity">+</button>
+                <button type="button" class="btn-remove-card" onclick="removeDishCompletely('${dishId}')" title="Remove from platter" aria-label="Remove dish">✕</button>
+            </div>
+        `;
+            }
+            return `
+        <button type="button" class="btn-add-dish" onclick="addDishToPlatter('${dishId}')">
+            <span>➕ Add to Platter</span>
+        </button>
+    `;
+        }
 
-function removePlateItem(itemId) {
-    delete selectedPlateItems[itemId];
-    updatePlateUI();
-    renderCategoryDishes();
-}
+        /**
+         * Add dish to platter
+         */
+        function addDishToPlatter(dishId) {
+            const dish = allMenuDishes.find(d => String(d.id || d._id) === String(dishId));
+            if (!dish) return;
 
-function updatePlateUI() {
-    const listContainer = document.getElementById("plateItemsContainer");
-    const countBadge = document.getElementById("thaliItemCountText");
-    const summarySubtitle = document.getElementById("plateSummarySubtitle");
-    const subtotalElem = document.getElementById("billSubtotal");
-    const totalElem = document.getElementById("billTotalAmount");
+            if (!selectedDishes[dishId]) {
+                selectedDishes[dishId] = { dish: dish, qty: 1 };
+            } else {
+                selectedDishes[dishId].qty += 1;
+            }
 
-    const items = Object.values(selectedPlateItems);
-    const count = items.length;
+            updateCardVisual(dishId);
+            updateBillUI();
+        }
 
-    countBadge.textContent = `${count} Item${count !== 1 ? 's' : ''} Selected`;
-    summarySubtitle.textContent = count > 0 ? `${count} items in royal platter` : 'Empty Plate';
+        /**
+         * Change quantity of a dish by delta (+1 or -1)
+         */
+        function changeDishQty(dishId, delta) {
+            if (!selectedDishes[dishId]) {
+                if (delta > 0) addDishToPlatter(dishId);
+                return;
+            }
 
-    if (count === 0) {
-        listContainer.innerHTML = `
+            selectedDishes[dishId].qty += delta;
+
+            if (selectedDishes[dishId].qty <= 0) {
+                delete selectedDishes[dishId];
+            }
+
+            updateCardVisual(dishId);
+            updateBillUI();
+        }
+
+        /**
+         * Remove dish completely
+         */
+        function removeDishCompletely(dishId) {
+            delete selectedDishes[dishId];
+            updateCardVisual(dishId);
+            updateBillUI();
+        }
+
+        /**
+         * Clear all selected dishes
+         */
+        function clearSelection() {
+            const previousKeys = Object.keys(selectedDishes);
+            selectedDishes = {};
+
+            previousKeys.forEach(id => updateCardVisual(id));
+            updateBillUI();
+        }
+
+        /**
+         * Updates card UI in place without full page re-render
+         */
+        function updateCardVisual(dishId) {
+            const card = document.getElementById(`dish-card-${dishId}`);
+            const actions = document.getElementById(`actions-${dishId}`);
+            const inPlate = selectedDishes[dishId];
+            const qty = inPlate ? inPlate.qty : 0;
+
+            if (card) {
+                if (qty > 0) {
+                    card.classList.add('in-plate');
+                } else {
+                    card.classList.remove('in-plate');
+                }
+            }
+
+            if (actions) {
+                actions.innerHTML = renderCardActionButtons(dishId, qty);
+            }
+        }
+
+        /**
+         * Live Bill Calculator: Updates item name x quantity = amount, subtotal, and total instantly
+         */
+        function updateBillUI() {
+            const listContainer = document.getElementById('plateItemsContainer');
+            const countBadge = document.getElementById('thaliItemCountText');
+            const summarySubtitle = document.getElementById('plateSummarySubtitle');
+            const subtotalElem = document.getElementById('billSubtotal');
+            const totalElem = document.getElementById('billTotalAmount');
+
+            // Mobile floating bar elements
+            const mobileBar = document.getElementById('mobileFloatingBar');
+            const mobileCount = document.getElementById('mobileBarCount');
+            const mobileTotal = document.getElementById('mobileBarTotal');
+
+            const selectedEntries = Object.entries(selectedDishes);
+            let totalItemsCount = 0;
+            let distinctVarieties = selectedEntries.length;
+            let grandSubtotal = 0;
+
+            if (distinctVarieties === 0) {
+                countBadge.textContent = 'Empty Platter';
+                summarySubtitle.textContent = '0 items selected';
+                subtotalElem.textContent = '₹0.00';
+                totalElem.textContent = '₹0.00';
+
+                listContainer.innerHTML = `
             <div class="empty-thali-msg">
                 Tap dishes on the left to add items to your royal thali!
             </div>
         `;
-        subtotalElem.textContent = "₹0.00";
-        totalElem.textContent = "₹0.00";
-        return;
-    }
 
-    listContainer.innerHTML = "";
-    let total = 0;
+                if (mobileBar) mobileBar.classList.remove('active');
+                return;
+            }
 
-    items.forEach(item => {
-        total += item.price;
-        const row = document.createElement("div");
-        row.className = "plate-item-row";
+            listContainer.innerHTML = '';
 
-        row.innerHTML = `
-            <div class="plate-item-left">
-                <span class="icon">${item.icon}</span>
-                <span class="plate-item-name">${item.name}</span>
+            selectedEntries.forEach(([dishId, item]) => {
+                const dish = item.dish;
+                const qty = item.qty;
+                const unitPrice = parsePrice(dish.price);
+                const lineTotal = unitPrice * qty;
+
+                totalItemsCount += qty;
+                grandSubtotal += lineTotal;
+
+                const row = document.createElement('div');
+                row.className = 'plate-item-row';
+                row.id = `plate-row-${dishId}`;
+
+                row.innerHTML = `
+            <div class="plate-item-top">
+                <div class="plate-item-left">
+                    <span class="icon">${renderDishVisual(dish)}</span>
+                    <span class="plate-item-name" title="${escapeHtml(dish.name)}">${escapeHtml(dish.name)}</span>
+                </div>
+                <div class="plate-item-actions-top">
+                    <button type="button" class="btn-qty-sm" onclick="changeDishQty('${dishId}', -1)" aria-label="Decrease quantity">−</button>
+                    <span class="qty-sm-count">${qty}</span>
+                    <button type="button" class="btn-qty-sm" onclick="changeDishQty('${dishId}', 1)" aria-label="Increase quantity">+</button>
+                    <button type="button" class="btn-remove-item" onclick="removeDishCompletely('${dishId}')" title="Remove" aria-label="Remove item">✕</button>
+                </div>
             </div>
-            <div class="plate-item-right">
-                <span class="plate-item-price">₹${item.price}</span>
-                <button type="button" class="btn-remove-item" onclick="removePlateItem('${item.id}')" title="Remove">✕</button>
+            <div class="plate-item-math-row">
+                <span style="color:#aaa;">Calculation:</span>
+                <div class="plate-item-equation">
+                    <span class="eq-unit">${formatCurrency(unitPrice)}</span>
+                    <span style="color:#777;">×</span>
+                    <span class="eq-qty">${qty}</span>
+                    <span style="color:#777;">=</span>
+                    <span class="eq-amount">${formatCurrency(lineTotal)}</span>
+                </div>
             </div>
         `;
 
-        listContainer.appendChild(row);
-    });
+                listContainer.appendChild(row);
+            });
 
-    subtotalElem.textContent = `₹${total}.00`;
-    totalElem.textContent = `₹${total}.00`;
-}
+            const formattedTotal = formatCurrency(grandSubtotal);
 
-function clearThali() {
-    selectedPlateItems = {};
-    updatePlateUI();
-    renderCategoryDishes();
-}
+            countBadge.textContent = `${totalItemsCount} Item${totalItemsCount !== 1 ? 's' : ''} (${distinctVarieties} Dishes)`;
+            summarySubtitle.textContent = `${totalItemsCount} item${totalItemsCount !== 1 ? 's' : ''} in royal platter`;
+            subtotalElem.textContent = formattedTotal;
+            totalElem.textContent = formattedTotal;
 
-// Quick 1-click Preset Loaders
-function loadThaliPreset(presetKey) {
-    selectedPlateItems = {};
+            // Update Mobile Floating Bar
+            if (mobileBar) {
+                mobileCount.textContent = `${totalItemsCount} Item${totalItemsCount !== 1 ? 's' : ''}`;
+                mobileTotal.textContent = formattedTotal;
+                mobileBar.classList.add('active');
+            }
+        }
 
-    if (presetKey === 'mutton') {
-        const pMutton = MEAL_CATALOG.mains.find(d => d.id === 'm2');
-        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b2');
-        const pRice = MEAL_CATALOG.rice.find(d => d.id === 'r2');
-        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd2');
-        const pSweet = MEAL_CATALOG.sweets.find(d => d.id === 's1');
-        [pMutton, pBhakri, pRice, pDrink, pSweet].forEach(item => {
-            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
-        });
-    } else if (presetKey === 'veg_royal') {
-        const pThali = MEAL_CATALOG.mains.find(d => d.id === 'm1');
-        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b1');
-        const pRice = MEAL_CATALOG.rice.find(d => d.id === 'r1');
-        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd1');
-        const pSweet = MEAL_CATALOG.sweets.find(d => d.id === 's2');
-        [pThali, pBhakri, pRice, pDrink, pSweet].forEach(item => {
-            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
-        });
-    } else if (presetKey === 'pithla') {
-        const pPithla = MEAL_CATALOG.mains.find(d => d.id === 'm5');
-        const pBhakri = MEAL_CATALOG.breads.find(d => d.id === 'b1');
-        const pDrink = MEAL_CATALOG.drinks.find(d => d.id === 'd1');
-        [pPithla, pBhakri, pDrink].forEach(item => {
-            if (item) selectedPlateItems[item.id] = { ...item, qty: 1 };
-        });
-    }
+        /**
+         * Smoothly scrolls to bill summary (useful on mobile)
+         */
+        function scrollToSummary() {
+            const panel = document.getElementById('thaliSummaryPanel');
+            if (panel) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
 
-    updatePlateUI();
-    renderCategoryDishes();
-}
+        /**
+         * Modal Order Showcase
+         */
+        function openOrderModal() {
+            const selectedEntries = Object.entries(selectedDishes);
+            if (selectedEntries.length === 0) {
+                alert('Please add at least one dish to your platter before placing an order!');
+                return;
+            }
 
-// Modal Order Showcase
-function openOrderModal() {
-    const items = Object.values(selectedPlateItems);
-    if (items.length === 0) {
-        alert("Please add at least one dish to your platter before placing an order!");
-        return;
-    }
+            const modalSummary = document.getElementById('modalReceiptSummary');
+            let total = 0;
+            let html = `<ul style="margin:0; padding-left:18px; color:#ddd; font-size:0.85rem; line-height:1.9;">`;
 
-    const modalSummary = document.getElementById("modalReceiptSummary");
-    let total = 0;
-    let html = `<ul style="margin:0; padding-left:18px; color:#ddd; font-size:0.85rem; line-height:1.8;">`;
+            selectedEntries.forEach(([id, item]) => {
+                const unit = parsePrice(item.dish.price);
+                const amount = unit * item.qty;
+                total += amount;
+                html += `<li><strong>${escapeHtml(item.dish.name)}</strong> — ${formatCurrency(unit)} × ${item.qty} = <span style="color:#f7e7b4; font-weight:700;">${formatCurrency(amount)}</span></li>`;
+            });
 
-    items.forEach(i => {
-        total += i.price;
-        html += `<li><strong>${i.name}</strong> - ₹${i.price}</li>`;
-    });
+            html += `</ul><div style="margin-top:14px; border-top:1px solid rgba(212,175,55,0.3); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="color:#aaa; font-size:0.9rem;">Grand Total Amount:</span>
+        <span style="font-weight:800; color:#d4af37; font-size:1.25rem; font-family:'Cinzel',serif;">${formatCurrency(total)}</span>
+    </div>`;
 
-    html += `</ul><div style="margin-top:12px; border-top:1px solid rgba(212,175,55,0.3); padding-top:8px; font-weight:800; color:#d4af37; font-size:1.05rem;">Grand Total: ₹${total}.00</div>`;
+            modalSummary.innerHTML = html;
+            document.getElementById('orderModalOverlay').style.display = 'flex';
+        }
 
-    modalSummary.innerHTML = html;
-    document.getElementById("orderModalOverlay").style.display = "flex";
-}
+        function closeOrderModal() {
+            document.getElementById('orderModalOverlay').style.display = 'none';
+        }
 
-function closeOrderModal() {
-    document.getElementById("orderModalOverlay").style.display = "none";
-}
+        function handleModalOverlayClick(event) {
+            if (event.target === document.getElementById('orderModalOverlay')) {
+                closeOrderModal();
+            }
+        }
 
-// Initial Render
-renderCategoryDishes();
-updatePlateUI();
-</script>
+        // Initial Boot
+        fetchMenuDishes();
+    </script>
 
 </body>
+
 </html>

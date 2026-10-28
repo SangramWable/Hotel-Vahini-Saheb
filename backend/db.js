@@ -23,7 +23,7 @@ function normalizeMongoUri(raw) {
     return raw;
 }
 
-const rawUri = process.env.MONGODB_URI || "REMOVED<db_password>@cluster0.hpquwnp.mongodb.net/hotel_vahinisaheb?retryWrites=true&w=majority&appName=Cluster0";
+const rawUri = process.env.MONGODB_URI || "REMOVED";
 const uri = normalizeMongoUri(rawUri);
 
 // Validate password placeholder
