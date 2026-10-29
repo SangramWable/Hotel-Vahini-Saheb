@@ -281,7 +281,25 @@ function renderMenuItems(items, isOffline = false) {
         return;
     }
 
-    items.forEach(item => {
+    const getCategoryOrder = item => {
+        const category = (item.category || "").trim().toLowerCase();
+        if (category.includes("nonveg") || category.includes("non-veg") || category.includes("non veg")) return 0;
+        if (category.includes("bread") || category.includes("roti")) return 2;
+        if (category.includes("drink") || category.includes("beverage")) return 3;
+        if (category.includes("veg")) return 1;
+        return 4;
+    };
+
+    const orderedItems = [...items].sort((first, second) => {
+        const categoryDifference = getCategoryOrder(first) - getCategoryOrder(second);
+        if (categoryDifference !== 0) return categoryDifference;
+
+        const firstIsThali = /\bthali$/i.test((first.name || "").trim());
+        const secondIsThali = /\bthali$/i.test((second.name || "").trim());
+        return Number(secondIsThali) - Number(firstIsThali);
+    });
+
+    orderedItems.forEach(item => {
         const card = document.createElement("div");
         card.className = "food-card";
 
