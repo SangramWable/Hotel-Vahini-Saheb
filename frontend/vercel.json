@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://hotel-vahini-saheb-api.onrender.com/api/:path*"
+      "destination": "https://hotel-vahini-saheb.onrender.com/api/:path*"
     },
     {
       "source": "/",
