@@ -1166,9 +1166,13 @@ async function convertImageToBase64(file) {
 }
 
 function isSafeHttpOrRelativeUrl(value) {
-    if (typeof value !== "string" || !value.trim() || /[\u0000-\u0020\\]/.test(value)) return false;
+    if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function") {
+        return window.isSafeImageSrc(value);
+    }
+    if (typeof value !== "string") return false;
     const trimmed = value.trim();
-    if (trimmed.startsWith("//")) return false;
+    if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
+    if (!trimmed || /[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
     try {
         const parsed = new URL(trimmed, window.location.href);
         return parsed.protocol === "http:" || parsed.protocol === "https:";

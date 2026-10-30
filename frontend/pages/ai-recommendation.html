@@ -1071,6 +1071,18 @@
 <script src="../assets/js/script.js"></script>
 
 <script>
+const isSafeImageSrc = window.isSafeImageSrc || function(val) {
+    if (typeof val !== "string") return false;
+    const trimmed = val.trim();
+    if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
+    if (!trimmed || /[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
+    try {
+        const parsed = new URL(trimmed, window.location.href);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch { return false; }
+};
+const isSafeHttpOrRelativeUrl = isSafeImageSrc;
+
 // ==========================================
 // INTERACTIVE AI CHIPS SELECTION & LOGIC
 // ==========================================

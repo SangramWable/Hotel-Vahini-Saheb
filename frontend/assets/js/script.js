@@ -9,10 +9,14 @@ function toggleMenu(toggleButton) {
     }
 }
 
-function isSafeHttpOrRelativeUrl(value) {
-    if (typeof value !== "string" || !value.trim() || /[\u0000-\u0020\\]/.test(value)) return false;
+function isSafeImageSrc(value) {
+    if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function") {
+        return window.isSafeImageSrc(value);
+    }
+    if (typeof value !== "string") return false;
     const trimmed = value.trim();
-    if (trimmed.startsWith("//")) return false;
+    if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
+    if (!trimmed || /[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
     try {
         const parsed = new URL(trimmed, window.location.href);
         return parsed.protocol === "http:" || parsed.protocol === "https:";
@@ -20,6 +24,8 @@ function isSafeHttpOrRelativeUrl(value) {
         return false;
     }
 }
+
+const isSafeHttpOrRelativeUrl = isSafeImageSrc;
 
 
 /* MENU FILTER + SEARCH */
@@ -326,7 +332,7 @@ function renderMenuItems(items, fallbackReason = null) {
             img.style.height = "100%";
             img.style.objectFit = "cover";
             image.appendChild(img);
-        } else if (item.image) {
+        } else if (item.image && !item.image.startsWith("data:")) {
             image.textContent = item.image;
         } else {
             image.textContent = "🍽️";
