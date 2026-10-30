@@ -7,6 +7,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "seed": "node scripts/seed.js",
+    "diagnose-db": "node scripts/diagnose-db.js",
     "provision-admin": "node scripts/provision-admin.js",
     "test": "jest --runInBand",
     "lint": "eslint --config eslint.config.js src scripts server.js tests",

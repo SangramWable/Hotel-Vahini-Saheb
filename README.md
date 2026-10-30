@@ -16,7 +16,7 @@ A restaurant website with a static frontend and an Express 5 API backed by Mongo
 Requirements: Node.js 20.19 or newer, npm, and MongoDB Atlas or a local MongoDB instance.
 
 1. Copy `backend/.env.example` to `backend/.env`.
-2. Set `MONGODB_URI` to a database you intend to use and set a random `JWT_SECRET` of at least 32 characters.
+2. Set `MONGODB_URI` to a cluster you intend to use and set a random `JWT_SECRET` of at least 32 characters. Set `MONGODB_DB_NAME` when the database to use differs from the database name in the URI; if omitted, Mongoose uses the URI's database name (or its default).
 3. Keep `AUTO_SAMPLE_DATA=false`. Set `CORS_ORIGINS` to the exact browser origins you use if you serve the frontend separately; the backend-served site is same-origin.
 4. Install and start the backend:
 
@@ -28,13 +28,14 @@ Requirements: Node.js 20.19 or newer, npm, and MongoDB Atlas or a local MongoDB 
 
 5. Open `http://localhost:5000/`. The backend serves the frontend and API on the same origin. The health endpoint is `http://localhost:5000/api/health`.
 
-The backend requires `MONGODB_URI` and will not fall back to a configured database URI. Never put real credentials in committed files.
+The backend requires `MONGODB_URI` and will not fall back to a configured database URI. `MONGODB_DB_NAME` is an optional database-name override. Never put real credentials in committed files.
 
 ## Environment variables
 
 | Variable | Required | Purpose |
 |---|---|---|
 | `MONGODB_URI` | Yes | MongoDB connection string |
+| `MONGODB_DB_NAME` | No | Optional database name override; when set, this selects the database regardless of the database path in `MONGODB_URI` |
 | `JWT_SECRET` | Yes | Secret used to sign administrator session tokens; minimum 32 characters |
 | `PORT` | No | HTTP port; defaults to `5000` locally and is provided by Render in production |
 | `CORS_ORIGINS` | For cross-origin requests | Comma-separated exact browser origins; configure the deployed Vercel origin |
@@ -90,6 +91,7 @@ The intended deployment is same-origin: Vercel serves the static frontend and re
 The root `render.yaml` defines a Node web service named `hotel-vahini-saheb-api`, with `backend/` as its root, `npm install` as its build command, `npm start` as its start command, and `/api/health` as its health check. Set these environment variables in Render:
 
 - `MONGODB_URI`
+- `MONGODB_DB_NAME` (optional database override; set to `hotel_vahinisaheb` for the menu database found by the read-only diagnostic)
 - `JWT_SECRET`
 - `CORS_ORIGINS` (the exact deployed Vercel origin)
 

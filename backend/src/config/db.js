@@ -40,7 +40,10 @@ if (uri.includes("<db_password>")) {
 
 mongoose
     .connect(uri, {
-        serverSelectionTimeoutMS: 5000
+        serverSelectionTimeoutMS: 5000,
+        ...(process.env.MONGODB_DB_NAME
+            ? { dbName: process.env.MONGODB_DB_NAME }
+            : {})
     })
     .then(async () => {
         console.log("MongoDB Atlas connected successfully to Hotel Vahinisaheb cluster!");
