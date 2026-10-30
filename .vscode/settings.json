@@ -2,7 +2,7 @@
     "liveServer.settings.root": "/frontend",
     "liveServer.settings.port": 5500,
     "liveServer.settings.CustomBrowser": "chrome",
-    "livePreview.defaultPreviewPath": "/frontend/index.html",
+    "livePreview.defaultPreviewPath": "/frontend/pages/index.html",
     "livePreview.port": 5500,
     "livePreview.openPreviewTarget": "Embedded",
     "files.associations": {

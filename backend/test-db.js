@@ -1,9 +1,9 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const Menu = require("./models/Menu");
-const Review = require("./models/Review");
-const Feedback = require("./models/Feedback");
-const Admin = require("./models/Admin");
+const Menu = require("./src/models/Menu");
+const Review = require("./src/models/Review");
+const Feedback = require("./src/models/Feedback");
+const Admin = require("./src/models/Admin");
 
 // Helper: auto-encode password if needed
 function normalizeMongoUri(raw) {
