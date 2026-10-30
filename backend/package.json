@@ -10,9 +10,10 @@
     "diagnose-db": "node scripts/diagnose-db.js",
     "provision-admin": "node scripts/provision-admin.js",
     "import-menu": "node scripts/import-menu.js",
+    "list-dishes": "node scripts/list-dishes.js",
     "test": "jest --runInBand",
     "lint": "eslint --config eslint.config.js src scripts server.js tests",
-    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js && node --check scripts/import-menu.js"
+    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js && node --check scripts/import-menu.js && node --check scripts/list-dishes.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -31,6 +32,7 @@
     "eslint": "^10.14.0",
     "globals": "^17.13.0",
     "jest": "^30.5.2",
+    "sharp": "^0.35.5",
     "supertest": "^7.3.1"
   }
 }
