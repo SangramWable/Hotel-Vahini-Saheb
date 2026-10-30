@@ -1,4 +1,4 @@
-process.env.JWT_SECRET = "REMOVED";
+process.env.JWT_SECRET = "t".repeat(48);
 process.env.CORS_ORIGINS = "http://localhost:5500";
 
 const request = require("supertest");

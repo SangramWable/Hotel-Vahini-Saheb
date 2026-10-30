@@ -40,8 +40,8 @@ The backend requires `MONGODB_URI` and will not fall back to a configured databa
 | `CORS_ORIGINS` | For cross-origin requests | Comma-separated exact browser origins; configure the deployed Vercel origin |
 | `NODE_ENV` | No | Set to `production` on Render |
 | `AUTO_SAMPLE_DATA` | No | Defaults off; sample insertion only runs when explicitly `true` outside production |
-| `ADMIN_USERNAME` | Provisioning only | Administrator username for the provisioning command |
-| `ADMIN_PASSWORD` | Provisioning only | Unique administrator password of at least 12 characters |
+| `ADMIN_USERNAME` | Provisioning only | Temporary administrator username supplied to the provisioning command |
+| `ADMIN_PASSWORD` | Provisioning only | Temporary administrator password of at least 12 characters; do not save it in project configuration |
 
 Administrator passwords are stored as bcrypt hashes. Sessions use an eight-hour signed JWT in an `HttpOnly`, `SameSite=Strict` cookie, marked `Secure` in production. Use HTTPS in production.
 
@@ -85,12 +85,13 @@ The intended deployment is same-origin: Vercel serves the static frontend and re
 
 ### Render backend
 
-The root `render.yaml` defines a Node web service named `hotel-vahini-saheb-api`, with `backend/` as its root, `npm install` as its build command, `npm start` as its start command, and `/api/health` as its health check. Set these secret environment variables in Render:
+The root `render.yaml` defines a Node web service named `hotel-vahini-saheb-api`, with `backend/` as its root, `npm install` as its build command, `npm start` as its start command, and `/api/health` as its health check. Set these environment variables in Render:
 
 - `MONGODB_URI`
 - `JWT_SECRET`
 - `CORS_ORIGINS` (the exact deployed Vercel origin)
-- `ADMIN_USERNAME` and `ADMIN_PASSWORD` for one-time provisioning
+
+Supply `ADMIN_USERNAME` and `ADMIN_PASSWORD` only temporarily when running the provisioning command. They are intentionally omitted from the committed environment examples and Render service configuration.
 
 `NODE_ENV=production` and `AUTO_SAMPLE_DATA=false` are set by the Render configuration. Render supplies `PORT`.
 
