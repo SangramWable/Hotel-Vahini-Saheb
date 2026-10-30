@@ -50,14 +50,16 @@ Administrator passwords are stored as bcrypt hashes. Sessions use an eight-hour 
 Set provisioning credentials only in the current shell or a secrets manager, never in source control. From `backend/`:
 
 ```powershell
-$env:ADMIN_USERNAME = "your-admin-name"
-$env:ADMIN_PASSWORD = "a-long-unique-password"
+$env:ADMIN_USERNAME = Read-Host "Admin username"
+$securePassword = Read-Host "Admin password" -AsSecureString
+$env:ADMIN_PASSWORD = [Net.NetworkCredential]::new("", $securePassword).Password
 npm run provision-admin
 Remove-Item Env:ADMIN_USERNAME
 Remove-Item Env:ADMIN_PASSWORD
+$securePassword.Dispose()
 ```
 
-The script refuses to overwrite an existing account unless `--rotate-existing` is explicitly supplied. Remove the temporary provisioning variables from the deployment environment after provisioning.
+The script refuses to overwrite an existing account unless `--rotate-existing` is explicitly supplied. Unset the temporary provisioning variables after provisioning.
 
 ## Tests and checks
 
