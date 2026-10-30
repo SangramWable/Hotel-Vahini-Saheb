@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const path = require("path");
+const mongoose = require("mongoose");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -28,7 +29,9 @@ const frontendRoot = path.join(__dirname, "../../frontend");
 app.use(express.static(frontendRoot));
 
 app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({
+        database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    });
 });
 
 app.get("/", (req, res) => {

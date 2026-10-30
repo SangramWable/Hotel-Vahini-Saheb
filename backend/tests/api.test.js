@@ -25,13 +25,28 @@ describe("restructured frontend serving", () => {
         const stylesheet = await request(app).get("/assets/css/style.css");
 
         expect(health.status).toBe(200);
-        expect(health.body).toEqual({ status: "ok" });
         expect(root.status).toBe(302);
         expect(root.headers.location).toBe("/pages/index.html");
         expect(page.status).toBe(200);
         expect(page.headers["content-type"]).toContain("text/html");
         expect(stylesheet.status).toBe(200);
         expect(stylesheet.headers["content-type"]).toContain("text/css");
+    });
+
+    describe("health endpoint", () => {
+        test("reports only whether the database connection is connected", async () => {
+            originalReadyState = mongoose.connection.readyState;
+
+            mongoose.connection.readyState = 1;
+            const connected = await request(app).get("/api/health");
+            expect(connected.status).toBe(200);
+            expect(connected.body).toEqual({ database: "connected" });
+
+            mongoose.connection.readyState = 0;
+            const disconnected = await request(app).get("/api/health");
+            expect(disconnected.status).toBe(200);
+            expect(disconnected.body).toEqual({ database: "disconnected" });
+        });
     });
 });
 
@@ -184,6 +199,29 @@ describe("review validation and moderation", () => {
 });
 
 describe("input validation and pagination", () => {
+    test("menu list does not filter out items missing availability or status fields", async () => {
+        originalReadyState = mongoose.connection.readyState;
+        mongoose.connection.readyState = 1;
+        const itemWithoutOptionalFilterFields = {
+            _id: new mongoose.Types.ObjectId(),
+            name: "Legacy dish",
+            category: "veg",
+            price: 100
+        };
+        const count = jestApi.spyOn(Menu, "countDocuments").mockResolvedValue(1);
+        const find = jestApi.spyOn(Menu, "find").mockReturnValue(
+            queryResult([itemWithoutOptionalFilterFields])
+        );
+
+        const response = await request(app).get("/api/menu");
+
+        expect(response.status).toBe(200);
+        expect(count).toHaveBeenCalledWith();
+        expect(find).toHaveBeenCalledWith();
+        expect(response.body).toHaveLength(1);
+        expect(response.body[0].name).toBe("Legacy dish");
+    });
+
     test("rejects invalid feedback and menu payloads", async () => {
         const feedback = await request(app)
             .post("/api/feedback")
