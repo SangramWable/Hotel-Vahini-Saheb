@@ -11,6 +11,7 @@ const app = require("../src/app");
 const Admin = require("../src/models/Admin");
 const Menu = require("../src/models/Menu");
 const Review = require("../src/models/Review");
+const { isSafeImageSrc, isSafeHref } = require("../../frontend/assets/js/api");
 
 jestApi.setTimeout(30000);
 
@@ -244,6 +245,26 @@ describe("input validation and pagination", () => {
             .set("Cookie", adminSessionCookie())
             .send({ name: "Dish", category: "veg", price: 10, image: "javascript:alert(1)" });
         expect(unsafeImage.status).toBe(400);
+
+        const dataUriImage = await request(app)
+            .post("/api/menu")
+            .set("Cookie", adminSessionCookie())
+            .send({ name: "Dish", category: "veg", price: 10, image: "data:image/jpeg;base64,/9j/4AAQSkZJRg==" });
+        expect(dataUriImage.status).toBe(400);
+
+        jestApi.spyOn(Menu.prototype, "save").mockResolvedValue({ _id: new mongoose.Types.ObjectId() });
+
+        const validPathImage = await request(app)
+            .post("/api/menu")
+            .set("Cookie", adminSessionCookie())
+            .send({ name: "Safe Path Dish", category: "veg", price: 100, image: "/assets/images/menu/safe-dish.webp" });
+        expect(validPathImage.status).toBe(201);
+
+        const validUrlImage = await request(app)
+            .post("/api/menu")
+            .set("Cookie", adminSessionCookie())
+            .send({ name: "Safe URL Dish", category: "veg", price: 150, image: "https://example.com/dish.webp" });
+        expect(validUrlImage.status).toBe(201);
     });
 
     test("caps page size and provides pagination metadata", async () => {
@@ -294,3 +315,36 @@ describe("input validation and pagination", () => {
         expect(response.body).toHaveLength(1);
     });
 });
+
+describe("shared frontend URL and image sanitizers", () => {
+    test("allows safe image data URIs (jpeg, png, webp) and standard paths/URLs", () => {
+        expect(isSafeImageSrc("data:image/jpeg;base64,/9j/4AAQSkZJRg==")).toBe(true);
+        expect(isSafeImageSrc("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")).toBe(true);
+        expect(isSafeImageSrc("data:image/webp;base64,UklGRkAAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAIAAAAA")).toBe(true);
+        expect(isSafeImageSrc("/assets/images/menu/mutton-rassa.webp")).toBe(true);
+        expect(isSafeImageSrc("https://example.com/photo.jpg")).toBe(true);
+        expect(isSafeImageSrc("../assets/images/logo.jpeg")).toBe(true);
+    });
+
+    test("strictly rejects dangerous schemes, text/html, svg+xml, and malformed inputs", () => {
+        expect(isSafeImageSrc("javascript:alert(1)")).toBe(false);
+        expect(isSafeImageSrc("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==")).toBe(false);
+        expect(isSafeImageSrc("data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=")).toBe(false);
+        expect(isSafeImageSrc("data:application/javascript;base64,YWxlcnQoMSk=")).toBe(false);
+        expect(isSafeImageSrc("//malicious.domain/image.png")).toBe(false);
+        expect(isSafeImageSrc("vbscript:msgbox(1)")).toBe(false);
+        expect(isSafeImageSrc(null)).toBe(false);
+        expect(isSafeImageSrc("")).toBe(false);
+    });
+
+    test("isSafeHref allows safe links and rejects all data URIs and javascript", () => {
+        expect(isSafeHref("https://example.com")).toBe(true);
+        expect(isSafeHref("/pages/menu.html")).toBe(true);
+        expect(isSafeHref("#section")).toBe(true);
+        expect(isSafeHref("data:image/jpeg;base64,/9j/4AAQSkZJRg==")).toBe(false);
+        expect(isSafeHref("data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==")).toBe(false);
+        expect(isSafeHref("javascript:alert(1)")).toBe(false);
+        expect(isSafeHref("//malicious.domain/test")).toBe(false);
+    });
+});
+

@@ -8,3 +8,4 @@ backend/.env
 **/coverage/
 .vercel/
 dish-names.txt
+*menu-backup*.json

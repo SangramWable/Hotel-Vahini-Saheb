@@ -6,29 +6,52 @@ const ALLOWED_CATEGORIES = new Set([
     "dessert",
     "special"
 ]);
-const MAX_IMAGE_DATA_URL_BYTES = 80 * 1024;
 
 function isAllowedMenuImage(image) {
     if (image === undefined || image === null || image === "") return true;
     if (typeof image !== "string") return false;
 
-    if (image.startsWith("data:image/")) {
-        return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(image)
-            && Buffer.byteLength(image, "utf8") <= MAX_IMAGE_DATA_URL_BYTES;
+    const trimmed = image.trim();
+    if (!trimmed) return true;
+
+    // Explicitly reject data URIs on write so base64 never returns to the database
+    if (trimmed.toLowerCase().startsWith("data:")) {
+        return false;
     }
 
-    if (/^https?:\/\//i.test(image)) {
+    // Accept HTTPS URLs
+    if (/^https:\/\//i.test(trimmed)) {
         try {
-            const parsed = new URL(image);
-            return (parsed.protocol === "http:" || parsed.protocol === "https:") && Boolean(parsed.hostname);
+            const parsed = new URL(trimmed);
+            return parsed.protocol === "https:" && Boolean(parsed.hostname);
         } catch {
             return false;
         }
     }
 
-    return /^(?:\/|\.\/)?[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(image)
-        && !image.includes("\\")
-        && !image.split("/").includes("..");
+    // Accept /assets/images/menu/<slug>.(webp|jpg|jpeg|png) paths
+    if (trimmed.startsWith("/assets/images/menu/")) {
+        const file = trimmed.slice("/assets/images/menu/".length);
+        return /^[A-Za-z0-9][A-Za-z0-9._-]*\.(?:webp|jpeg|jpg|png)$/i.test(file)
+            && !file.includes("..")
+            && !file.includes("\\");
+    }
+
+    // Also accept assets/images/menu/<slug> without leading slash
+    if (trimmed.startsWith("assets/images/menu/")) {
+        const file = trimmed.slice("assets/images/menu/".length);
+        return /^[A-Za-z0-9][A-Za-z0-9._-]*\.(?:webp|jpeg|jpg|png)$/i.test(file)
+            && !file.includes("..")
+            && !file.includes("\\");
+    }
+
+    // Accept fallback emoji or short indicator
+    // eslint-disable-next-line no-control-regex
+    if (trimmed.length <= 8 && !/[\u0000-\u0020\\]/.test(trimmed)) {
+        return true;
+    }
+
+    return false;
 }
 
 function validateMenuPayload(payload) {
@@ -51,10 +74,10 @@ function validateMenuPayload(payload) {
         errors.push("Badge must be at most 40 characters.");
     }
     if (!isAllowedMenuImage(image)) {
-        errors.push("Image must be an HTTP(S) URL, a safe relative path, or a supported image data URL under 80 KB.");
+        errors.push("Image must be an HTTPS URL or a path in /assets/images/menu/ (data URIs are not allowed).");
     }
 
     return errors;
 }
 
-module.exports = { validateMenuPayload };
+module.exports = { validateMenuPayload, isAllowedMenuImage };

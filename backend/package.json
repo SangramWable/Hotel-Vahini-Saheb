@@ -11,9 +11,11 @@
     "provision-admin": "node scripts/provision-admin.js",
     "import-menu": "node scripts/import-menu.js",
     "list-dishes": "node scripts/list-dishes.js",
+    "export-menu-backup": "node scripts/export-menu-backup.js",
+    "migrate-images": "node scripts/migrate-menu-images.js",
     "test": "jest --runInBand",
     "lint": "eslint --config eslint.config.js src scripts server.js tests",
-    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js && node --check scripts/import-menu.js && node --check scripts/list-dishes.js"
+    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js && node --check scripts/import-menu.js && node --check scripts/list-dishes.js && node --check scripts/export-menu-backup.js && node --check scripts/migrate-menu-images.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
