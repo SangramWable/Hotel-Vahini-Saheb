@@ -934,7 +934,7 @@
                 </div>
                 <div class="db-status-badge">
                     <span class="pulse-dot"></span>
-                    <span>MongoDB Atlas Online (Port 5000)</span>
+                    <span id="databaseStatus">Checking database connection...</span>
                 </div>
             </div>
         </div>
@@ -1165,6 +1165,24 @@ requireAdminSession();
 function logout() {
     logoutAdmin();
 }
+
+async function updateDatabaseStatus() {
+    const status = document.getElementById("databaseStatus");
+    if (!status) return;
+
+    try {
+        const response = await window.apiFetch("/api/health");
+        if (!response.ok) throw new Error(`Health check failed (HTTP ${response.status})`);
+        const result = await response.json();
+        status.textContent = result.database === "connected"
+            ? "Database connected"
+            : "Database disconnected";
+    } catch (error) {
+        console.error("Could not check database connection:", error);
+        status.textContent = "Database status unavailable";
+    }
+}
+updateDatabaseStatus();
 
 // ==========================================
 // LIVE CLOCK DISPLAY

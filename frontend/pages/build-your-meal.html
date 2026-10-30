@@ -1637,6 +1637,8 @@
             const errorState = document.getElementById('dishesErrorState');
             const emptyState = document.getElementById('dishesEmptyState');
             const container = document.getElementById('dishesContainer');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
 
             loadingState.style.display = 'block';
             errorState.style.display = 'none';
@@ -1644,15 +1646,12 @@
             container.style.display = 'none';
 
             try {
-                let response;
-                if (typeof fetchApi === 'function') {
-                    response = await fetchApi(`/api/menu?page=${page}&limit=100`);
-                } else {
-                    response = await window.apiFetch(`/api/menu?page=${page}&limit=100`);
-                }
+                const response = await window.apiFetch(`/api/menu?page=${page}&limit=100`, {
+                    signal: controller.signal
+                });
 
                 if (!response.ok) {
-                    throw new Error(`Server returned HTTP status ${response.status}`);
+                    throw new Error(`API error (HTTP ${response.status})`);
                 }
 
                 const data = await response.json();
@@ -1678,9 +1677,16 @@
             } catch (err) {
                 console.error('Failed to load menu dishes:', err);
                 loadingState.style.display = 'none';
+                const reason = err.name === "AbortError"
+                    ? "API request timed out (15-second limit)."
+                    : err instanceof TypeError
+                        ? "API error (network request failed)."
+                        : err.message;
                 document.getElementById('dishesErrorMessage').textContent =
-                    `Could not load dishes from backend (/api/menu): ${err.message}. Please verify the server is running on port 5000.`;
+                    `Could not load dishes from /api/menu: ${reason}`;
                 errorState.style.display = 'block';
+            } finally {
+                clearTimeout(timeoutId);
             }
         }
 

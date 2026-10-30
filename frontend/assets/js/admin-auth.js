@@ -1,7 +1,3 @@
-function adminApiUrls(endpoint) {
-    return [`${(window.API_BASE_URL || "").replace(/\/$/, "")}${endpoint}`];
-}
-
 async function adminRequest(endpoint, options = {}) {
     const response = await window.apiFetch(endpoint, options);
     if (response.status === 401 || response.status === 403) {

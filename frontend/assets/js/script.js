@@ -250,17 +250,17 @@ let databaseMenuItems = [];
 let currentMenuPage = 1;
 let menuTotalPages = 1;
 
-function renderMenuItems(items, isOffline = false) {
+function renderMenuItems(items, fallbackReason = null) {
     const menuGrid = document.getElementById("menuGrid");
     if (!menuGrid) return;
 
     menuGrid.replaceChildren();
 
-    if (isOffline) {
+    if (fallbackReason) {
         const notice = document.createElement("div");
         notice.style.cssText = "grid-column: 1 / -1; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; color: #f7e7b4;";
         const noticeText = document.createElement("span");
-        noticeText.textContent = "⚡ Showing signature menu preview. (Live server connecting...)";
+        noticeText.textContent = `⚡ Showing signature menu preview. ${fallbackReason}`;
         const retryButton = document.createElement("button");
         retryButton.type = "button";
         retryButton.textContent = "🔄 Sync Database";
@@ -371,27 +371,56 @@ async function loadMenuFromDatabase(page = 1) {
     const menuGrid = document.getElementById("menuGrid");
     if (!menuGrid) return;
 
-    try {
-        const response = await fetchApi(`/api/menu?page=${page}&limit=100`);
-        if (!response.ok) throw new Error("HTTP " + response.status);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        databaseMenuItems = await response.json();
+    try {
+        const response = await fetchApi(`/api/menu?page=${page}&limit=100`, {
+            signal: controller.signal
+        });
+        if (!response.ok) {
+            const error = new Error(`API error (HTTP ${response.status})`);
+            error.status = response.status;
+            throw error;
+        }
+
+        const menuItems = await response.json();
+        if (!Array.isArray(menuItems)) {
+            throw new Error("API error (invalid menu response)");
+        }
+
+        if (menuItems.length === 0) {
+            throw new Error("EMPTY_MENU_LIST");
+        }
+
+        databaseMenuItems = menuItems;
         currentMenuPage = Number(response.headers.get("X-Page")) || page;
         menuTotalPages = Number(response.headers.get("X-Total-Pages")) || 1;
-        renderMenuItems(databaseMenuItems, false);
+        renderMenuItems(databaseMenuItems);
         if (typeof renderPaginationControls === "function") {
             renderPaginationControls("menuPagination", currentMenuPage, menuTotalPages, response.headers.get("X-Total-Count"), loadMenuFromDatabase);
         }
         console.log("Menu successfully loaded from MongoDB Atlas:", databaseMenuItems.length, "dishes");
     } catch (error) {
-        console.warn("Could not reach backend menu API, using fallback preview:", error);
+        const fallbackReason = error.message === "EMPTY_MENU_LIST"
+            ? "API returned an empty list."
+            : error.name === "AbortError"
+                ? "API request timed out (15-second limit)."
+                : error.status
+                    ? error.message
+                    : error instanceof TypeError
+                        ? "API error (network request failed)."
+                        : error.message;
+        console.warn("Menu API unavailable; showing fallback preview:", fallbackReason);
         databaseMenuItems = DEFAULT_MENU_FALLBACK;
         currentMenuPage = 1;
         menuTotalPages = 1;
-        renderMenuItems(DEFAULT_MENU_FALLBACK, true);
+        renderMenuItems(DEFAULT_MENU_FALLBACK, fallbackReason);
         if (typeof renderPaginationControls === "function") {
             renderPaginationControls("menuPagination", 1, 1, databaseMenuItems.length, loadMenuFromDatabase);
         }
+    } finally {
+        clearTimeout(timeoutId);
     }
 }
 
