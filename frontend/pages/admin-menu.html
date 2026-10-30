@@ -453,11 +453,11 @@
         <form id="menuForm" class="feedback-form" style="margin-top:20px;">
             <div class="form-row">
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Name *</label>
+                    <label for="dishName" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Name *</label>
                     <input type="text" id="dishName" placeholder="e.g. Kolhapuri Mutton Sukka" required>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Category *</label>
+                    <label for="dishCategory" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Category *</label>
                     <select id="dishCategory" required style="width:100%;padding:13px;margin-bottom:13px;background:#15100c;border:1px solid #533d21;border-radius:7px;color:white;outline:none;">
                         <option value="">Select Category</option>
                         <option value="veg">Veg Main Course / Starter</option>
@@ -472,19 +472,19 @@
 
             <div class="form-row">
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Price (₹) *</label>
+                    <label for="dishPrice" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Price (₹) *</label>
                     <input type="number" id="dishPrice" placeholder="e.g. 280" min="1" step="0.5" required>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Badge Tag (Optional)</label>
+                    <label for="dishBadge" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Badge Tag (Optional)</label>
                     <input type="text" id="dishBadge" placeholder="e.g. CHEF'S PICK, BEST SELLER, POPULAR">
                 </div>
             </div>
 
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Description</label>
+            <label for="dishDescription" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Description</label>
             <textarea id="dishDescription" placeholder="Describe the ingredients, spice profile, and authentic cooking tradition..."></textarea>
 
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Image (Photo File or Emoji)</label>
+            <label for="dishImage" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Image (Photo File or Emoji)</label>
             <input type="file" id="dishImage" accept="image/*" style="display:none;" onchange="handleAddImagePreview(this)">
             
             <label for="dishImage" class="custom-file-label">
@@ -517,7 +517,7 @@
     <!-- Filter & Search Controls -->
     <div class="admin-controls-bar">
         <div class="search-input-wrap">
-            <input type="text" id="adminMenuSearch" placeholder="🔍 Search dish name, category, or price..." oninput="handleAdminSearch()">
+            <input type="text" id="adminMenuSearch" aria-label="Search menu items" placeholder="🔍 Search dish name, category, or price..." oninput="handleAdminSearch()">
         </div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -562,11 +562,11 @@
 
             <div class="form-row">
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Name *</label>
+                    <label for="editDishName" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Name *</label>
                     <input type="text" id="editDishName" required>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Category *</label>
+                    <label for="editDishCategory" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Category *</label>
                     <select id="editDishCategory" required style="width:100%;padding:13px;margin-bottom:13px;background:#15100c;border:1px solid #533d21;border-radius:7px;color:white;outline:none;">
                         <option value="veg">Veg Main Course / Starter</option>
                         <option value="nonveg">Non-Veg Specialty</option>
@@ -580,20 +580,20 @@
 
             <div class="form-row">
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Price (₹) *</label>
+                    <label for="editDishPrice" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Price (₹) *</label>
                     <input type="number" id="editDishPrice" min="1" step="0.5" required>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Badge Tag (Optional)</label>
+                    <label for="editDishBadge" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Badge Tag (Optional)</label>
                     <input type="text" id="editDishBadge" placeholder="e.g. CHEF'S PICK, BEST SELLER">
                 </div>
             </div>
 
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Description</label>
+            <label for="editDishDescription" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Description</label>
             <textarea id="editDishDescription" placeholder="Description of dish..."></textarea>
 
             <!-- Image Section -->
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Image</label>
+            <label for="editDishImage" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Dish Image</label>
             
             <div id="editCurrentImgBox" class="image-preview-wrap">
                 <div id="editCurrentThumbContainer" style="width:70px;height:70px;display:flex;align-items:center;justify-content:center;background:#000;border-radius:6px;overflow:hidden;border:1px solid #d4af37;">

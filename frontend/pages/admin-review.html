@@ -425,7 +425,7 @@
     <!-- CONTROLS: SEARCH & FILTER -->
     <div class="admin-controls-bar">
         <div class="search-box">
-            <input type="text" id="reviewSearch" placeholder="🔍 Search by customer name or review text..." oninput="handleSearch()">
+            <input type="text" id="reviewSearch" aria-label="Search reviews" placeholder="🔍 Search by customer name or review text..." oninput="handleSearch()">
         </div>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -467,12 +467,12 @@
         <form id="reviewModalForm" class="feedback-form" onsubmit="handleReviewFormSubmit(event)">
             <input type="hidden" id="modalReviewId">
 
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Customer Name *</label>
+            <label for="modalReviewName" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Customer Name *</label>
             <input type="text" id="modalReviewName" placeholder="e.g. Anand Jadhav" required>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Rating *</label>
+                    <label for="modalReviewRating" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Rating *</label>
                     <select id="modalReviewRating" required style="width:100%;padding:13px;margin-bottom:13px;background:#15100c;border:1px solid #533d21;border-radius:7px;color:white;outline:none;">
                         <option value="5">★★★★★ (5 Stars)</option>
                         <option value="4">★★★★☆ (4 Stars)</option>
@@ -482,7 +482,7 @@
                     </select>
                 </div>
                 <div>
-                    <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Status *</label>
+                    <label for="modalReviewStatus" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Status *</label>
                     <select id="modalReviewStatus" required style="width:100%;padding:13px;margin-bottom:13px;background:#15100c;border:1px solid #533d21;border-radius:7px;color:white;outline:none;">
                         <option value="pending">Pending Approval</option>
                         <option value="approved">Approved (Live on Website)</option>
@@ -491,7 +491,7 @@
                 </div>
             </div>
 
-            <label style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Review Comment / Message *</label>
+            <label for="modalReviewMessage" style="font-size:0.8rem;color:#ccc;display:block;margin-bottom:6px;">Review Comment / Message *</label>
             <textarea id="modalReviewMessage" placeholder="Customer dining comments..." required style="min-height:100px;"></textarea>
 
             <div style="display:flex;gap:12px;margin-top:20px;">

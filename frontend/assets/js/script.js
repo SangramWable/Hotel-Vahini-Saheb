@@ -7,17 +7,17 @@ function toggleMenu(toggleButton) {
     if (button && button.hasAttribute("aria-expanded")) {
         button.setAttribute("aria-expanded", String(expanded));
     }
+}
 
-    function isSafeHttpOrRelativeUrl(value) {
-        if (typeof value !== "string" || !value.trim() || /[\u0000-\u0020\\]/.test(value)) return false;
-        const trimmed = value.trim();
-        if (trimmed.startsWith("//")) return false;
-        try {
-            const parsed = new URL(trimmed, window.location.href);
-            return parsed.protocol === "http:" || parsed.protocol === "https:";
-        } catch {
-            return false;
-        }
+function isSafeHttpOrRelativeUrl(value) {
+    if (typeof value !== "string" || !value.trim() || /[\u0000-\u0020\\]/.test(value)) return false;
+    const trimmed = value.trim();
+    if (trimmed.startsWith("//")) return false;
+    try {
+        const parsed = new URL(trimmed, window.location.href);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+        return false;
     }
 }
 
@@ -591,17 +591,19 @@ function applyReviewFilters() {
 }
 
 // Render Review Cards Grid
-function renderReviewCards(reviews, isOffline = false) {
+function renderReviewCards(reviews, fallbackReason = null) {
     const reviewsContainer = document.getElementById("reviewsContainer");
     if (!reviewsContainer) return;
 
     reviewsContainer.replaceChildren();
 
-    if (isOffline) {
+    if (fallbackReason) {
         const notice = document.createElement("div");
         notice.style.cssText = "grid-column: 1 / -1; background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; text-align: center; font-size: 0.85rem; color: #f7e7b4; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;";
         const noticeText = document.createElement("span");
-        noticeText.textContent = "⭐ Showing approved guest reviews preview. (Live database reconnecting...)";
+        noticeText.textContent = typeof fallbackReason === "string"
+            ? `⭐ Showing approved guest reviews preview. ${fallbackReason}`
+            : "⭐ Showing approved guest reviews preview.";
         const retryButton = document.createElement("button");
         retryButton.type = "button";
         retryButton.textContent = "🔄 Retry Sync";
@@ -716,24 +718,48 @@ async function loadReviews(page = 1) {
     const reviewsContainer = document.getElementById("reviewsContainer");
     if (!reviewsContainer) return;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
-        const response = await fetchApi(`/api/reviews?page=${page}&limit=100`);
+        const response = await fetchApi(`/api/reviews?page=${page}&limit=100`, {
+            signal: controller.signal
+        });
         if (!response.ok) {
-            throw new Error("Failed to load reviews from server");
+            const error = new Error(`API error (HTTP ${response.status})`);
+            error.status = response.status;
+            throw error;
         }
 
         const reviews = await response.json();
+        if (!Array.isArray(reviews)) {
+            throw new Error("API error (invalid reviews response)");
+        }
+
+        if (reviews.length === 0) {
+            throw new Error("EMPTY_REVIEWS_LIST");
+        }
+
         currentReviewsPage = Number(response.headers.get("X-Page")) || page;
         reviewsTotalPages = Number(response.headers.get("X-Total-Pages")) || 1;
         if (typeof renderPaginationControls === "function") {
             renderPaginationControls("reviewsPagination", currentReviewsPage, reviewsTotalPages, response.headers.get("X-Total-Count"), loadReviews);
         }
-        allReviewsData = Array.isArray(reviews) && reviews.length > 0 ? reviews : DEFAULT_REVIEWS_FALLBACK;
+        allReviewsData = reviews;
         updateReviewsAnalytics(allReviewsData);
         applyReviewFilters();
         console.log("Reviews successfully loaded from database:", allReviewsData.length);
     } catch (error) {
-        console.warn("Could not reach backend reviews API, using fallback preview:", error);
+        const fallbackReason = error.message === "EMPTY_REVIEWS_LIST"
+            ? "API returned an empty list."
+            : error.name === "AbortError"
+                ? "API request timed out (15-second limit)."
+                : error.status
+                    ? error.message
+                    : error instanceof TypeError
+                        ? "API error (network request failed)."
+                        : error.message;
+        console.warn("Could not reach backend reviews API, using fallback preview:", fallbackReason);
         allReviewsData = DEFAULT_REVIEWS_FALLBACK;
         currentReviewsPage = 1;
         reviewsTotalPages = 1;
@@ -741,7 +767,9 @@ async function loadReviews(page = 1) {
             renderPaginationControls("reviewsPagination", 1, 1, allReviewsData.length, loadReviews);
         }
         updateReviewsAnalytics(allReviewsData);
-        renderReviewCards(DEFAULT_REVIEWS_FALLBACK, true);
+        renderReviewCards(DEFAULT_REVIEWS_FALLBACK, fallbackReason);
+    } finally {
+        clearTimeout(timeoutId);
     }
 }
 
