@@ -49,7 +49,7 @@ router.get("/", async (req, res) => {
         }
 
         // Fallback to seedData if database is connecting/offline
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
             const revs = (data.reviews || []).filter(r => r.status === "approved");
@@ -61,7 +61,7 @@ router.get("/", async (req, res) => {
         res.json([]);
     } catch (err) {
         console.error("GET REVIEWS ERROR:", err);
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
             const approved = (data.reviews || []).filter(r => r.status === "approved");

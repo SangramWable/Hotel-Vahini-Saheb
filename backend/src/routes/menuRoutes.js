@@ -44,18 +44,39 @@ router.get("/", async (req, res) => {
     try {
         const pagination = getPagination(req, res);
         if (!pagination) return;
+
+        const filter = {};
+        if (req.query.category && typeof req.query.category === "string" && req.query.category.trim() !== "" && req.query.category !== "all") {
+            filter.category = req.query.category.trim().toLowerCase();
+        }
+        if (req.query.available !== undefined && req.query.available !== "") {
+            const isAvail = req.query.available === "true" || req.query.available === true || req.query.available === "1";
+            if (isAvail) {
+                filter.$or = [{ available: true }, { available: { $exists: false } }, { available: null }];
+            } else {
+                filter.available = false;
+            }
+        }
+
         if (mongoose.connection.readyState === 1) {
-            const total = await Menu.countDocuments();
-            const items = await Menu.find().sort({ createdAt: -1 }).skip(pagination.skip).limit(pagination.limit);
+            const hasFilter = Object.keys(filter).length > 0;
+            const total = await (hasFilter ? Menu.countDocuments(filter) : Menu.countDocuments());
+            const items = await (hasFilter ? Menu.find(filter) : Menu.find())
+                .sort({ createdAt: -1 })
+                .skip(pagination.skip)
+                .limit(pagination.limit);
             setPaginationHeaders(res, pagination, total);
             return res.json(items.map(formatMenuItem));
         }
 
         // Fallback to seedData if database is connecting/offline
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
-            const menu = data.menu || [];
+            let menu = data.menu || [];
+            if (filter.category) {
+                menu = menu.filter(m => (m.category || "").toLowerCase() === filter.category);
+            }
             setPaginationHeaders(res, pagination, menu.length);
             return res.json(menu.slice(pagination.skip, pagination.skip + pagination.limit).map(formatMenuItem));
         }
@@ -64,7 +85,7 @@ router.get("/", async (req, res) => {
         res.json([]);
     } catch (err) {
         console.error("GET MENU ERROR:", err);
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
             const pagination = getPagination(req, res);

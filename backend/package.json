@@ -9,9 +9,10 @@
     "seed": "node scripts/seed.js",
     "diagnose-db": "node scripts/diagnose-db.js",
     "provision-admin": "node scripts/provision-admin.js",
+    "import-menu": "node scripts/import-menu.js",
     "test": "jest --runInBand",
     "lint": "eslint --config eslint.config.js src scripts server.js tests",
-    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js"
+    "check": "node --check server.js && node --check src/app.js && node --check src/config/db.js && node --check scripts/seed.js && node --check scripts/diagnose-db.js && node --check scripts/import-menu.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

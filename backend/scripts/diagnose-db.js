@@ -17,7 +17,7 @@ function normalizeMongoUri(raw) {
 async function main() {
     const rawUri = process.env.MONGODB_URI;
     if (!rawUri) {
-        throw new Error("MONGODB_URI is not configured.");
+        throw new Error("MONGODB_URI is not configured in backend/.env.");
     }
 
     await mongoose.connect(normalizeMongoUri(rawUri), {
@@ -29,64 +29,81 @@ async function main() {
 
     const appDatabaseName = mongoose.connection.name;
     const menuCollectionName = Menu.collection.collectionName;
-    const { databases } = await mongoose.connection.db.admin().listDatabases({
+
+    // List all databases on the cluster
+    const adminDb = mongoose.connection.db.admin();
+    const { databases } = await adminDb.listDatabases({
         nameOnly: true,
         authorizedDatabases: false
     });
 
     const databaseReports = [];
-    const menuLikeCollectionsInOtherDatabases = [];
-    const menuLikeNames = new Set(["menuitems", "menus", "dishes"]);
-    let appMenuCount = 0;
 
     for (const { name: databaseName } of databases) {
-        const database = mongoose.connection.getClient().db(databaseName);
-        const collections = await database.listCollections({}, { nameOnly: true }).toArray();
+        const db = mongoose.connection.getClient().db(databaseName);
+        const collections = await db.listCollections({}, { nameOnly: true }).toArray();
         const collectionReports = [];
 
-        for (const { name: collectionName } of collections) {
-            const count = await database.collection(collectionName).countDocuments({});
-            collectionReports.push({ name: collectionName, documentCount: count });
-
-            if (
-                databaseName === appDatabaseName &&
-                collectionName === menuCollectionName
-            ) {
-                appMenuCount = count;
-            }
-
-            if (
-                databaseName !== appDatabaseName &&
-                menuLikeNames.has(collectionName.toLowerCase())
-            ) {
-                menuLikeCollectionsInOtherDatabases.push({
-                    database: databaseName,
-                    collection: collectionName,
-                    documentCount: count
-                });
-            }
+        for (const { name: colName } of collections) {
+            const count = await db.collection(colName).countDocuments({});
+            collectionReports.push({ collection: colName, documentCount: count });
         }
 
-        databaseReports.push({ name: databaseName, collections: collectionReports });
+        databaseReports.push({ database: databaseName, collections: collectionReports });
     }
 
-    console.log(JSON.stringify({
-        appDatabaseName,
-        databases: databaseReports,
-        appMenuCollection: {
+    // Diagnostics on the connected app database for Menu collection
+    const activeDb = mongoose.connection.db;
+    const menuCol = activeDb.collection(menuCollectionName);
+    const totalMenuCount = await menuCol.countDocuments({});
+
+    // Group by category
+    const categoryAgg = await menuCol.aggregate([
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+    ]).toArray();
+
+    const categoryCounts = {};
+    categoryAgg.forEach(item => {
+        categoryCounts[item._id === null || item._id === undefined ? "missing" : String(item._id)] = item.count;
+    });
+
+    // Group by available field
+    const availableAgg = await menuCol.aggregate([
+        { $group: { _id: { $ifNull: ["$available", "missing"] }, count: { $sum: 1 } } }
+    ]).toArray();
+
+    const availableCounts = {};
+    availableAgg.forEach(item => {
+        availableCounts[String(item._id)] = item.count;
+    });
+
+    // Also check reviews, feedbacks, and admins collections in the connected database
+    const otherAppCollections = {};
+    for (const name of ["reviews", "feedbacks", "admins"]) {
+        const count = await activeDb.collection(name).countDocuments({});
+        otherAppCollections[name] = count;
+    }
+
+    const output = {
+        connectedDatabase: appDatabaseName,
+        clusterDatabases: databaseReports,
+        menuCollection: {
             name: menuCollectionName,
-            totalDocumentCount: appMenuCount,
-            routeFilterFields: [],
-            routeFilterCounts: {}
+            totalDocumentCount: totalMenuCount,
+            countsByCategory: categoryCounts,
+            countsByAvailability: availableCounts
         },
-        menuLikeCollectionsInOtherDatabases
-    }, null, 2));
+        otherAppCollections
+    };
+
+    console.log(JSON.stringify(output, null, 2));
 }
 
 main()
-    .catch(() => {
+    .catch((err) => {
         console.error(
-            "Database diagnosis failed. Confirm the read-only MongoDB account can list databases, collections, and document counts."
+            "Database diagnosis failed:", err.message
         );
         process.exitCode = 1;
     })

@@ -47,7 +47,7 @@ router.get("/", requireAdmin, async (req, res) => {
         }
 
         // Fallback to seedData if database is connecting/offline
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
             const feedback = data.feedback || [];
@@ -59,7 +59,7 @@ router.get("/", requireAdmin, async (req, res) => {
         res.json([]);
     } catch (err) {
         console.error("GET FEEDBACK ERROR:", err);
-        const seedFile = path.join(__dirname, "../seedData.json");
+        const seedFile = path.join(__dirname, "../../seedData.json");
         if (fs.existsSync(seedFile)) {
             const data = JSON.parse(fs.readFileSync(seedFile, "utf8"));
             const pagination = getPagination(req, res);

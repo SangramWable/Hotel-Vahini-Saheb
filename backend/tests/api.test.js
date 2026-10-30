@@ -121,6 +121,9 @@ describe("admin authentication", () => {
     });
 
     test("logs out and clears the session cookie", async () => {
+        const unauth = await request(app).post("/api/admin/logout");
+        expect(unauth.status).toBe(401);
+
         const response = await request(app)
             .post("/api/admin/logout")
             .set("Cookie", adminSessionCookie());
@@ -128,6 +131,8 @@ describe("admin authentication", () => {
         expect(response.status).toBe(200);
         expect(response.headers["set-cookie"][0]).toMatch(/^admin_token=;/);
         expect(response.headers["set-cookie"][0]).toMatch(/Expires=Thu, 01 Jan 1970/i);
+        expect(response.headers["set-cookie"][0]).toMatch(/SameSite=Strict/i);
+        expect(response.headers["set-cookie"][0]).toMatch(/HttpOnly/i);
     });
 
     test("rejects invalid credentials and rate-limits repeated bad logins", async () => {
@@ -261,5 +266,31 @@ describe("input validation and pagination", () => {
         expect(response.headers["x-limit"]).toBe("100");
         expect(response.headers["x-total-count"]).toBe("101");
         expect(query.limit).toHaveBeenCalledWith(100);
+    });
+
+    test("menu route applies category and tolerant available filters", async () => {
+        originalReadyState = mongoose.connection.readyState;
+        mongoose.connection.readyState = 1;
+        const item = {
+            _id: new mongoose.Types.ObjectId(),
+            name: "Veg Thali",
+            category: "veg",
+            price: 150
+        };
+        const count = jestApi.spyOn(Menu, "countDocuments").mockResolvedValue(1);
+        const find = jestApi.spyOn(Menu, "find").mockReturnValue(queryResult([item]));
+
+        const response = await request(app).get("/api/menu?category=veg&available=true");
+
+        expect(response.status).toBe(200);
+        expect(count).toHaveBeenCalledWith({
+            category: "veg",
+            $or: [{ available: true }, { available: { $exists: false } }, { available: null }]
+        });
+        expect(find).toHaveBeenCalledWith({
+            category: "veg",
+            $or: [{ available: true }, { available: { $exists: false } }, { available: null }]
+        });
+        expect(response.body).toHaveLength(1);
     });
 });
