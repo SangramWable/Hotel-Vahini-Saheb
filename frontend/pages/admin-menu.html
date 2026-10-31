@@ -1166,7 +1166,7 @@ async function convertImageToBase64(file) {
 }
 
 function isSafeHttpOrRelativeUrl(value) {
-    if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function") {
+    if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function" && window.isSafeImageSrc !== isSafeHttpOrRelativeUrl) {
         return window.isSafeImageSrc(value);
     }
     if (typeof value !== "string") return false;

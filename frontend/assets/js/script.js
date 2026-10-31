@@ -9,21 +9,26 @@ function toggleMenu(toggleButton) {
     }
 }
 
-function isSafeImageSrc(value) {
-    if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function") {
-        return window.isSafeImageSrc(value);
-    }
+function validateImageSrc(value) {
     if (typeof value !== "string") return false;
     const trimmed = value.trim();
+    if (!trimmed) return false;
     if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
-    if (!trimmed || /[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
+    if (/[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
     try {
-        const parsed = new URL(trimmed, window.location.href);
+        const base = (typeof window !== "undefined" && window.location && window.location.href)
+            ? window.location.href
+            : "https://hotel-vahini-saheb.example.com/";
+        const parsed = new URL(trimmed, base);
         return parsed.protocol === "http:" || parsed.protocol === "https:";
     } catch {
         return false;
     }
 }
+
+const isSafeImageSrc = (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function" && window.isSafeImageSrc !== validateImageSrc)
+    ? window.isSafeImageSrc
+    : validateImageSrc;
 
 const isSafeHttpOrRelativeUrl = isSafeImageSrc;
 
