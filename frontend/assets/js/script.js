@@ -324,10 +324,10 @@ function renderMenuItems(items, fallbackReason = null) {
         const image = document.createElement("div");
         image.className = "food-img";
 
-        const titleTag = document.createElement("span");
-        titleTag.className = "food-img-title";
-        titleTag.textContent = item.name || "Authentic Dish";
-        image.appendChild(titleTag);
+        const banner = document.createElement("div");
+        banner.className = "food-img-banner";
+        banner.textContent = item.name || "Authentic Dish";
+        image.appendChild(banner);
 
         const info = document.createElement("div");
         info.className = "food-info";
