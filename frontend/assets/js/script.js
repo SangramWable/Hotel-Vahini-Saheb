@@ -324,10 +324,49 @@ function renderMenuItems(items, fallbackReason = null) {
         const image = document.createElement("div");
         image.className = "food-img";
 
-        const banner = document.createElement("div");
-        banner.className = "food-img-banner";
-        banner.textContent = item.name || "Authentic Dish";
-        image.appendChild(banner);
+        let tagClass = "tag-veg";
+        let displayCat = item.category || "General";
+        const catLower = (item.category || "").toLowerCase();
+        if (catLower === "veg") { tagClass = "tag-veg"; displayCat = "Veg"; }
+        else if (catLower.includes("nonveg") || catLower.includes("non-veg") || catLower.includes("non veg")) { tagClass = "tag-nonveg"; displayCat = "Non-Veg"; }
+        else if (catLower.includes("bread") || catLower.includes("roti")) { tagClass = "tag-breads"; displayCat = "Breads"; }
+        else if (catLower.includes("drink") || catLower.includes("beverage")) { tagClass = "tag-drinks"; displayCat = "Drinks"; }
+        else { tagClass = "tag-other"; }
+
+        const categoryTag = document.createElement("span");
+        categoryTag.className = `food-category-tag ${tagClass}`;
+        categoryTag.textContent = displayCat;
+        image.appendChild(categoryTag);
+
+        if (item.badge) {
+            const badge = document.createElement("span");
+            badge.className = "food-badge-pill";
+            badge.textContent = item.badge;
+            image.appendChild(badge);
+        }
+
+        const imgSrc = item.image;
+        if (isSafeHttpOrRelativeUrl(imgSrc)) {
+            const img = document.createElement("img");
+            img.setAttribute("src", imgSrc);
+            img.setAttribute("alt", item.name || "Dish");
+            img.setAttribute("loading", "lazy");
+            img.addEventListener("error", () => {
+                img.style.display = "none";
+                if (!image.querySelector(".food-fallback-emoji")) {
+                    const fallback = document.createElement("span");
+                    fallback.className = "food-fallback-emoji";
+                    fallback.textContent = "🍛";
+                    image.appendChild(fallback);
+                }
+            }, { once: true });
+            image.appendChild(img);
+        } else {
+            const emoji = document.createElement("span");
+            emoji.className = "food-fallback-emoji";
+            emoji.textContent = typeof imgSrc === "string" && !imgSrc.startsWith("data:") && imgSrc.trim().length > 0 ? imgSrc : "🍛";
+            image.appendChild(emoji);
+        }
 
         const info = document.createElement("div");
         info.className = "food-info";
@@ -346,13 +385,6 @@ function renderMenuItems(items, fallbackReason = null) {
         price.textContent = "₹" + item.price;
 
         bottom.appendChild(price);
-
-        if (item.badge) {
-            const badge = document.createElement("span");
-            badge.className = "badge";
-            badge.textContent = item.badge;
-            bottom.appendChild(badge);
-        }
 
         info.append(name, description, bottom);
         card.append(image, info);

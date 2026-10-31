@@ -576,19 +576,15 @@ header {
 .food-img {
     height: 190px;
 
-    background:
-        radial-gradient(circle at 30% 30%, rgba(93, 42, 12, .65) 0%, rgba(27, 13, 5, .98) 100%),
-        linear-gradient(135deg, #441a05, #180902);
+    background: linear-gradient(135deg, #2b170c, #120b06);
 
     display: flex;
 
-    align-items: flex-start;
+    align-items: center;
 
-    justify-content: flex-start;
+    justify-content: center;
 
-    padding: 22px 24px;
-
-    text-align: left;
+    padding: 0;
 
     position: relative;
 
@@ -597,25 +593,87 @@ header {
     border-bottom: 1px solid rgba(200, 155, 60, .25);
 }
 
-.food-img-banner {
-    font-family: 'Poppins', sans-serif;
+.food-img img {
+    width: 100%;
 
-    font-size: 34px;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    transition: transform .4s ease;
+}
+
+.food-card:hover .food-img img {
+    transform: scale(1.05);
+}
+
+.food-category-tag {
+    position: absolute;
+
+    top: 12px;
+
+    left: 12px;
+
+    font-size: 0.72rem;
 
     font-weight: 700;
 
-    color: #ffffff;
+    padding: 3px 9px;
 
-    line-height: 1.15;
+    border-radius: 12px;
 
-    letter-spacing: -.3px;
+    text-transform: uppercase;
 
-    text-shadow: 0 3px 12px rgba(0, 0, 0, .85);
+    background: rgba(0, 0, 0, .72);
 
-    word-break: break-word;
+    backdrop-filter: blur(4px);
 
-    user-select: none;
+    border: 1px solid rgba(255, 255, 255, .2);
+
+    z-index: 2;
+
+    letter-spacing: .5px;
 }
+
+.food-badge-pill {
+    position: absolute;
+
+    top: 12px;
+
+    right: 12px;
+
+    background: var(--gold, #d4af37);
+
+    color: #120b06;
+
+    font-size: 0.7rem;
+
+    font-weight: 800;
+
+    padding: 3px 9px;
+
+    border-radius: 12px;
+
+    text-transform: uppercase;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+
+    z-index: 2;
+
+    letter-spacing: .5px;
+}
+
+.food-fallback-emoji {
+    font-size: 3.5rem;
+}
+
+.tag-veg { color: #4ade80; border-color: #4ade80 !important; }
+.tag-nonveg { color: #f87171; border-color: #f87171 !important; }
+.tag-breads { color: #fbbf24; border-color: #fbbf24 !important; }
+.tag-drinks { color: #38bdf8; border-color: #38bdf8 !important; }
+.tag-other { color: #c084fc; border-color: #c084fc !important; }
 
 .food-info {
     padding: 24px;

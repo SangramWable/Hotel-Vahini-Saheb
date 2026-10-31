@@ -1614,11 +1614,22 @@
          */
         function renderDishVisual(dish) {
             const img = dish.image;
+            const cat = normalizeCategoryKey(dish.category);
+            const fallbackEmoji = cat === 'nonveg' ? '🍗' : (cat === 'breads' ? '🫓' : (cat === 'drinks' ? '🥛' : '🍛'));
             if (isSafeHttpOrRelativeUrl(img)) {
                 const image = makeNode("img");
                 image.setAttribute("src", img);
                 image.setAttribute("alt", dish.name || "Dish");
                 image.setAttribute("loading", "lazy");
+                image.addEventListener("error", function() {
+                    const parent = image.parentElement;
+                    if (parent) {
+                        image.remove();
+                        const icon = makeNode("span", "", fallbackEmoji);
+                        icon.style.fontSize = "2rem";
+                        parent.appendChild(icon);
+                    }
+                }, { once: true });
                 return image;
             }
             if (img && !img.startsWith("data:") && img.trim().length > 0) {
@@ -1626,8 +1637,6 @@
                 icon.style.fontSize = "2rem";
                 return icon;
             }
-            const cat = normalizeCategoryKey(dish.category);
-            const fallbackEmoji = cat === 'nonveg' ? '🍗' : (cat === 'breads' ? '🫓' : (cat === 'drinks' ? '🥛' : '🍛'));
             const icon = makeNode("span", "", fallbackEmoji);
             icon.style.fontSize = "2rem";
             return icon;
