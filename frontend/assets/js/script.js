@@ -321,23 +321,6 @@ function renderMenuItems(items, fallbackReason = null) {
 
         card.dataset.category = filterCategory;
 
-        const image = document.createElement("div");
-        image.className = "food-img";
-
-        if (isSafeHttpOrRelativeUrl(item.image)) {
-            const img = document.createElement("img");
-            img.setAttribute("src", item.image);
-            img.alt = item.name || "Dish";
-            img.style.width = "100%";
-            img.style.height = "100%";
-            img.style.objectFit = "cover";
-            image.appendChild(img);
-        } else if (item.image && !item.image.startsWith("data:")) {
-            image.textContent = item.image;
-        } else {
-            image.textContent = "🍽️";
-        }
-
         const info = document.createElement("div");
         info.className = "food-info";
 
@@ -364,7 +347,7 @@ function renderMenuItems(items, fallbackReason = null) {
         }
 
         info.append(name, description, bottom);
-        card.append(image, info);
+        card.appendChild(info);
         menuGrid.appendChild(card);
     });
 
