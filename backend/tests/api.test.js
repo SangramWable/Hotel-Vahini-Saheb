@@ -11,7 +11,7 @@ const app = require("../src/app");
 const Admin = require("../src/models/Admin");
 const Menu = require("../src/models/Menu");
 const Review = require("../src/models/Review");
-const { isSafeImageSrc, isSafeHref } = require("../../frontend/assets/js/api");
+const { isSafeImageSrc, isSafeHref, formatPrice } = require("../../frontend/assets/js/api");
 
 jestApi.setTimeout(30000);
 
@@ -346,5 +346,20 @@ describe("shared frontend URL and image sanitizers", () => {
         expect(isSafeHref("javascript:alert(1)")).toBe(false);
         expect(isSafeHref("//malicious.domain/test")).toBe(false);
     });
+
+    test("formatPrice formats currency correctly in INR with 2 decimals and hides invalid prices", () => {
+        expect(formatPrice(280)).toBe("₹280.00");
+        expect(formatPrice(50.5)).toBe("₹50.50");
+        expect(formatPrice("320.00")).toBe("₹320.00");
+        expect(formatPrice("₹250")).toBe("₹250.00");
+        expect(formatPrice(0)).toBe(null);
+        expect(formatPrice(-15)).toBe(null);
+        expect(formatPrice("")).toBe(null);
+        expect(formatPrice(null)).toBe(null);
+        expect(formatPrice(undefined)).toBe(null);
+        expect(formatPrice("NaN")).toBe(null);
+        expect(formatPrice("not-a-number")).toBe(null);
+    });
 });
+
 

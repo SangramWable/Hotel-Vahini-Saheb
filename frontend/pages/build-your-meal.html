@@ -1582,6 +1582,10 @@
          * Formats a number to currency format (₹0.00)
          */
         function formatCurrency(amount) {
+            if (typeof window !== "undefined" && typeof window.formatPrice === "function") {
+                const formatted = window.formatPrice(amount);
+                if (formatted !== null) return formatted;
+            }
             const num = parsePrice(amount);
             return '₹' + num.toFixed(2);
         }

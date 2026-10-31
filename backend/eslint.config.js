@@ -41,6 +41,7 @@ module.exports = [
                 isSafeImageSrc: "readonly",
                 isSafeHref: "readonly",
                 isSafeHttpOrRelativeUrl: "readonly",
+                formatPrice: "readonly",
                 loadMenuFromDatabase: "readonly",
                 renderMenuItems: "readonly",
                 searchMenu: "readonly",

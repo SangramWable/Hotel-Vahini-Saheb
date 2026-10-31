@@ -89,7 +89,7 @@ function searchMenu() {
             categoryMatch && textMatch;
 
         card.style.display =
-            show ? "block" : "none";
+            show ? "" : "none";
 
         if (show) {
             visible++;
@@ -339,11 +339,6 @@ function renderMenuItems(items, fallbackReason = null) {
         else if (catLower.includes("drink") || catLower.includes("beverage")) { tagClass = "tag-drinks"; displayCat = "Drinks"; }
         else { tagClass = "tag-other"; }
 
-        const categoryTag = document.createElement("span");
-        categoryTag.className = `food-category-tag ${tagClass}`;
-        categoryTag.textContent = displayCat;
-        image.appendChild(categoryTag);
-
         if (item.badge) {
             const badge = document.createElement("span");
             badge.className = "food-badge-pill";
@@ -377,27 +372,85 @@ function renderMenuItems(items, fallbackReason = null) {
         const info = document.createElement("div");
         info.className = "food-info";
 
+        // Header Row: Dish Name & Price on same row, right-aligned, gold
+        const headerRow = document.createElement("div");
+        headerRow.className = "food-header";
+
         const name = document.createElement("h3");
+        name.className = "food-title";
         name.textContent = item.name || "Unnamed dish";
+        headerRow.appendChild(name);
 
-        const bottom = document.createElement("div");
-        bottom.className = "food-bottom";
+        const priceText = (typeof window !== "undefined" && typeof window.formatPrice === "function")
+            ? window.formatPrice(item.price)
+            : (typeof formatPrice === "function" ? formatPrice(item.price) : null);
 
-        const price = document.createElement("span");
-        price.className = "price";
-        const priceNum = typeof item.price === "number" ? item.price : parseFloat(item.price) || 0;
-        price.textContent = `₹${priceNum.toFixed(2)}`;
-        bottom.appendChild(price);
+        if (priceText) {
+            const price = document.createElement("span");
+            price.className = "food-price";
+            price.textContent = priceText;
+            headerRow.appendChild(price);
+        }
 
+        info.appendChild(headerRow);
+
+        // Description directly under title with normal line height
         const rawDesc = (item.description || "").trim();
         const isPlaceholder = !rawDesc || /^no description provided\.?$/i.test(rawDesc);
         if (!isPlaceholder) {
+            const descContainer = document.createElement("div");
+            descContainer.className = "food-desc-container";
+
+            const words = rawDesc.split(/\s+/).filter(Boolean);
+            const isLong = words.length >= 30;
+
             const description = document.createElement("p");
+            description.className = isLong ? "food-desc is-clamped" : "food-desc";
             description.textContent = rawDesc;
-            info.append(name, description, bottom);
-        } else {
-            info.append(name, bottom);
+
+            if (isLong) {
+                const descId = "desc-" + (item._id || item.id || Math.random().toString(36).slice(2, 9));
+                description.id = descId;
+
+                const toggleBtn = document.createElement("button");
+                toggleBtn.type = "button";
+                toggleBtn.className = "food-desc-toggle";
+                toggleBtn.setAttribute("aria-expanded", "false");
+                toggleBtn.setAttribute("aria-controls", descId);
+                toggleBtn.textContent = "Read more ▼";
+
+                toggleBtn.addEventListener("click", () => {
+                    const isNowClamped = description.classList.contains("is-clamped");
+                    if (isNowClamped) {
+                        description.classList.remove("is-clamped");
+                        toggleBtn.setAttribute("aria-expanded", "true");
+                        toggleBtn.textContent = "Show less ▲";
+                    } else {
+                        description.classList.add("is-clamped");
+                        toggleBtn.setAttribute("aria-expanded", "false");
+                        toggleBtn.textContent = "Read more ▼";
+                    }
+                });
+
+                descContainer.append(description, toggleBtn);
+            } else {
+                descContainer.appendChild(description);
+            }
+
+            info.appendChild(descContainer);
         }
+
+        // Footer Row: Category tag in a footer row
+        const footerRow = document.createElement("div");
+        footerRow.className = "food-footer";
+
+        const categoryTag = document.createElement("span");
+        categoryTag.className = `food-category-tag ${tagClass}`;
+        categoryTag.textContent = displayCat;
+        footerRow.appendChild(categoryTag);
+
+        info.appendChild(footerRow);
+
         card.append(image, info);
         menuGrid.appendChild(card);
     });

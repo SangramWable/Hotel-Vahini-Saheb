@@ -1,4 +1,4 @@
-/* global document */
+/* global document, window */
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -30,16 +30,26 @@ dishNames.forEach((name, idx) => {
         cat = 'nonveg';
     }
 
-    const hasDesc = idx % 7 !== 0; // Some dishes have no description as required
     const imgPath = `/assets/images/vahinisaheb${(idx % 8) + 1}.jpeg`;
+
+    let desc;
+    if (idx % 7 === 0) {
+        desc = idx % 14 === 0 ? "" : "No description provided.";
+    } else if (idx % 5 === 0) {
+        desc = "Authentic traditional Maharashtrian delicacy slow-cooked with roasted hand-ground spices, caramelized onions, fresh grated coconut, and signature Kolhapuri rassa gravy served piping hot with freshly made jowar bhakri, seasoned spiced onions, and refreshing chilled kokum solkadhi.";
+    } else {
+        desc = dishData[name] || "Authentic Maharashtrian delicacy prepared with traditional roasted spices.";
+    }
+
+    const price = idx % 8 === 0 ? null : (120 + (idx * 5) % 300);
 
     mockDishes.push({
         _id: `mock_dish_${idx + 1}`,
         id: `mock_dish_${idx + 1}`,
         name: name,
         category: cat,
-        price: 120 + (idx * 5) % 300,
-        description: hasDesc ? (dishData[name] || "Authentic Maharashtrian delicacy prepared with traditional roasted spices.") : "",
+        price: price,
+        description: desc,
         image: imgPath,
         photo: imgPath
     });
@@ -48,15 +58,23 @@ dishNames.forEach((name, idx) => {
 // Pad or trim to exactly 130 dishes (41 veg, 77 nonveg, 7 breads, 5 drinks)
 while (mockDishes.length < 130) {
     const idx = mockDishes.length;
-    const hasDesc = idx % 7 !== 0;
     const imgPath = `/assets/images/vahinisaheb${(idx % 8) + 1}.jpeg`;
+    let desc;
+    if (idx % 7 === 0) {
+        desc = "";
+    } else if (idx % 5 === 0) {
+        desc = "Authentic traditional Maharashtrian delicacy slow-cooked with roasted hand-ground spices, caramelized onions, fresh grated coconut, and signature Kolhapuri rassa gravy served piping hot with freshly made jowar bhakri, seasoned spiced onions, and refreshing chilled kokum solkadhi.";
+    } else {
+        desc = "Freshly prepared homestyle specialty.";
+    }
+    const price = idx % 8 === 0 ? null : 180;
     mockDishes.push({
         _id: `mock_dish_${idx + 1}`,
         id: `mock_dish_${idx + 1}`,
         name: `Special Dish ${idx + 1}`,
         category: 'veg',
-        price: 180,
-        description: hasDesc ? "Freshly prepared homestyle specialty." : "No description provided.",
+        price: price,
+        description: desc,
         image: imgPath,
         photo: imgPath
     });
@@ -225,6 +243,163 @@ async function runTests() {
         // 4. Assert zero console errors or uncaught page errors
         if (consoleErrors.length > 0) throw new Error(`Menu happy path produced console errors: ${JSON.stringify(consoleErrors)}`);
         console.log(`  ✓ Menu happy path: 0 console errors`);
+
+        // 4a. Assert Prices: visible, formatted with INR symbol and 2 decimals, or hidden when missing
+        const priceElements = await page.locator('.food-card .food-price').all();
+        console.log(`  ✓ Found ${priceElements.length} displayed price tags on page 1`);
+        if (priceElements.length === 0) throw new Error("Expected prices on page 1");
+        for (const priceEl of priceElements) {
+            const txt = (await priceEl.textContent()).trim();
+            if (!/^₹\d+\.\d{2}$/.test(txt)) {
+                throw new Error(`Invalid price format: "${txt}"`);
+            }
+        }
+        console.log(`  ✓ All displayed prices follow INR format ₹0.00 (e.g. ₹280.00)`);
+
+        const cardsWithoutPrice = await page.evaluate(() => {
+            const cards = Array.from(document.querySelectorAll('.food-card'));
+            return cards.filter(c => !c.querySelector('.food-price')).length;
+        });
+        console.log(`  ✓ Cards with missing/null price safely hide price element: ${cardsWithoutPrice} cards`);
+        if (cardsWithoutPrice === 0) throw new Error("Expected cards without price based on mock data");
+
+        // 4b. Assert Descriptions & "Read more" toggle
+        const toggleButtons = await page.locator('.food-desc-toggle').all();
+        console.log(`  ✓ Found ${toggleButtons.length} "Read more" toggle buttons for long descriptions`);
+        if (toggleButtons.length === 0) throw new Error("Expected long descriptions to have toggle buttons");
+
+        const firstToggle = page.locator('.food-desc-toggle').first();
+        const descId = await firstToggle.getAttribute('aria-controls');
+        const targetDesc = page.locator(`#${descId}`);
+
+        const initialExpanded = await firstToggle.getAttribute('aria-expanded');
+        const initialBtnText = (await firstToggle.textContent()).trim();
+        if (initialExpanded !== "false" || !initialBtnText.includes("Read more")) {
+            throw new Error(`Unexpected initial toggle state: aria-expanded=${initialExpanded}, text="${initialBtnText}"`);
+        }
+
+        // Test Click expansion
+        await firstToggle.click();
+        const afterClickClamped = await targetDesc.evaluate(el => el.classList.contains('is-clamped'));
+        const afterClickExpanded = await firstToggle.getAttribute('aria-expanded');
+        const afterClickBtnText = (await firstToggle.textContent()).trim();
+        if (afterClickClamped || afterClickExpanded !== "true" || !afterClickBtnText.includes("Show less")) {
+            throw new Error(`Toggle click failed: clamped=${afterClickClamped}, expanded=${afterClickExpanded}, text="${afterClickBtnText}"`);
+        }
+        console.log(`  ✓ Click "Read more" unclamps text and updates button to "${afterClickBtnText}"`);
+
+        // Test Keyboard collapse (Enter key)
+        await firstToggle.focus();
+        await page.keyboard.press('Enter');
+        const afterKeyClamped = await targetDesc.evaluate(el => el.classList.contains('is-clamped'));
+        const afterKeyExpanded = await firstToggle.getAttribute('aria-expanded');
+        if (!afterKeyClamped || afterKeyExpanded !== "false") {
+            throw new Error("Keyboard Enter failed to collapse description");
+        }
+        console.log(`  ✓ Keyboard Enter successfully collapsed description back to clamped state`);
+
+        // Assert: Placeholder descriptions (empty or "No description provided.") are completely hidden
+        const placeholderCount = await page.evaluate(() => {
+            const descs = Array.from(document.querySelectorAll('.food-desc'));
+            return descs.filter(d => !d.textContent.trim() || /^no description provided\.?$/i.test(d.textContent.trim())).length;
+        });
+        if (placeholderCount > 0) throw new Error(`Found ${placeholderCount} placeholder descriptions rendered`);
+        console.log(`  ✓ Placeholder descriptions are completely hidden (0 rendered)`);
+
+        // 4c. Assert No Card Text Clipping (scrollHeight <= clientHeight + 2 for unclamped elements)
+        const unclippedCheck = await page.evaluate(() => {
+            const titles = Array.from(document.querySelectorAll('.food-title'));
+            const unclampedDescs = Array.from(document.querySelectorAll('.food-desc:not(.is-clamped)'));
+            const tags = Array.from(document.querySelectorAll('.food-category-tag'));
+            const allToCheck = [...titles, ...unclampedDescs, ...tags];
+            const clipped = [];
+            for (const el of allToCheck) {
+                if (el.scrollHeight > el.clientHeight + 2) {
+                    clipped.push({ tag: el.tagName, text: el.textContent.substring(0, 30), scrollHeight: el.scrollHeight, clientHeight: el.clientHeight });
+                }
+            }
+            return clipped;
+        });
+        if (unclippedCheck.length > 0) {
+            throw new Error(`Found clipped text containers: ${JSON.stringify(unclippedCheck)}`);
+        }
+        console.log(`  ✓ No unclamped text containers are clipped (scrollHeight <= clientHeight)`);
+
+        // 4d. Assert Equal Heights for cards in each grid row
+        const rowHeightCheck = await page.evaluate(() => {
+            const cards = Array.from(document.querySelectorAll('.food-card'));
+            const rows = {};
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect();
+                const key = Math.round(rect.top / 8) * 8;
+                if (!rows[key]) rows[key] = [];
+                rows[key].push(rect.height);
+            }
+            const uneven = [];
+            for (const [key, heights] of Object.entries(rows)) {
+                if (heights.length > 1) {
+                    const min = Math.min(...heights);
+                    const max = Math.max(...heights);
+                    if (max - min > 2) {
+                        uneven.push({ rowTop: key, heights, diff: max - min });
+                    }
+                }
+            }
+            return uneven;
+        });
+        if (rowHeightCheck.length > 0) {
+            throw new Error(`Cards in row have uneven heights: ${JSON.stringify(rowHeightCheck)}`);
+        }
+        console.log(`  ✓ Cards in each grid row have equal height`);
+
+        // 4e. Assert Responsive Viewports, Columns, and No Horizontal Scroll (1280px, 768px, 360px)
+        const screenshotsDir = path.join(__dirname, '..', '..', 'frontend', 'screenshots');
+        if (!fs.existsSync(screenshotsDir)) {
+            fs.mkdirSync(screenshotsDir, { recursive: true });
+        }
+
+        const viewports = [
+            { width: 1280, height: 800, name: 'desktop', expectedCols: 3 },
+            { width: 768, height: 1024, name: 'tablet', expectedCols: 2 },
+            { width: 360, height: 740, name: 'mobile', expectedCols: 1 }
+        ];
+
+        const savedScreenshots = [];
+        for (const vp of viewports) {
+            await page.setViewportSize({ width: vp.width, height: vp.height });
+            await page.waitForTimeout(400);
+
+            // Assert no horizontal scrollbar
+            const scrollInfo = await page.evaluate(() => ({
+                scrollWidth: document.documentElement.scrollWidth,
+                clientWidth: document.documentElement.clientWidth
+            }));
+
+            if (scrollInfo.scrollWidth > scrollInfo.clientWidth) {
+                throw new Error(`Horizontal scroll detected at ${vp.width}px! scrollWidth: ${scrollInfo.scrollWidth}, clientWidth: ${scrollInfo.clientWidth}`);
+            }
+
+            const cols = await page.evaluate(() => {
+                const grid = document.getElementById('menuGrid');
+                const style = window.getComputedStyle(grid);
+                return style.gridTemplateColumns.split(' ').length;
+            });
+            console.log(`  ✓ Viewport ${vp.width}px (${vp.name}): ${cols} columns (expected ${vp.expectedCols}), 0 horizontal scroll`);
+            if (cols !== vp.expectedCols) {
+                throw new Error(`Expected ${vp.expectedCols} columns at ${vp.width}px, got ${cols}`);
+            }
+
+            const shotPath = path.join(screenshotsDir, `menu-${vp.width}px.png`);
+            await page.screenshot({ path: shotPath, fullPage: false });
+            savedScreenshots.push(shotPath);
+        }
+
+        console.log(`  ✓ Saved screenshots at widths 1280px, 768px, 360px:`);
+        savedScreenshots.forEach(s => console.log(`    - ${s}`));
+
+        // Restore viewport to desktop
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.waitForTimeout(200);
 
         // 5. Test Category Filters
         // Test Non-Veg filter

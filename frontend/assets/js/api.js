@@ -56,17 +56,45 @@
         }
     }
 
+    const inrCurrencyFormatter = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    function formatPrice(rawPrice) {
+        if (rawPrice === null || rawPrice === undefined || rawPrice === "") {
+            return null;
+        }
+        let num;
+        if (typeof rawPrice === "number") {
+            num = rawPrice;
+        } else {
+            const str = String(rawPrice).trim().replace(/,/g, "");
+            const cleaned = str.replace(/[^0-9.-]/g, "");
+            if (!cleaned) return null;
+            num = parseFloat(cleaned);
+        }
+        if (!Number.isFinite(num) || isNaN(num) || num <= 0) {
+            return null;
+        }
+        return inrCurrencyFormatter.format(num);
+    }
+
     global.apiFetch = apiFetch;
     global.isSafeImageSrc = isSafeImageSrc;
     global.isSafeHref = isSafeHref;
     global.isSafeHttpOrRelativeUrl = isSafeImageSrc;
+    global.formatPrice = formatPrice;
 
     if (typeof module !== "undefined" && module.exports) {
         module.exports = {
             apiFetch,
             isSafeImageSrc,
             isSafeHref,
-            isSafeHttpOrRelativeUrl: isSafeImageSrc
+            isSafeHttpOrRelativeUrl: isSafeImageSrc,
+            formatPrice
         };
     }
 })(typeof window !== "undefined" ? window : globalThis);

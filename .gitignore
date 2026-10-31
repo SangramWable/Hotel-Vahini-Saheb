@@ -9,3 +9,6 @@ backend/.env
 .vercel/
 dish-names.txt
 *menu-backup*.json
+screenshots/
+**/screenshots/
+
