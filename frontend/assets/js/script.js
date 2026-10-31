@@ -379,22 +379,29 @@ function renderMenuItems(items, fallbackReason = null) {
         const name = document.createElement("h3");
         name.textContent = item.name || "Unnamed dish";
 
-        const description = document.createElement("p");
-        description.textContent = item.description || "";
-
-        const bottom = document.createElement("div");
-        bottom.className = "food-bottom";
-
-        const price = document.createElement("span");
-        price.className = "price";
-        price.textContent = "₹" + item.price;
-
-        bottom.appendChild(price);
-
-        info.append(name, description, bottom);
+        const rawDesc = (item.description || "").trim();
+        const isPlaceholder = !rawDesc || /^no description provided\.?$/i.test(rawDesc);
+        if (!isPlaceholder) {
+            const description = document.createElement("p");
+            description.textContent = rawDesc;
+            info.append(name, description, bottom);
+        } else {
+            info.append(name, bottom);
+        }
         card.append(image, info);
         menuGrid.appendChild(card);
     });
+
+    const searchInput = document.getElementById("menuSearch");
+    if (searchInput && !searchInput.value) {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryParam = urlParams.get("search");
+            if (queryParam) {
+                searchInput.value = queryParam;
+            }
+        } catch (_) {}
+    }
 
     if (typeof searchMenu === "function") {
         searchMenu();

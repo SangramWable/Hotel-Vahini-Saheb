@@ -1513,8 +1513,8 @@
         let selectedDishes = {}; // { [dishId]: { dish: object, qty: number } }
         let bymActiveCategory = 'all';
         let bymSearchQuery = '';
-        let currentMenuPage = 1;
-        let menuTotalPages = 1;
+        let bymCurrentPage = 1;
+        let bymTotalPages = 1;
 
         // Category Configuration
         const CATEGORY_CONFIG = {
@@ -1593,8 +1593,8 @@
             return node;
         }
 
-        function isSafeHttpOrRelativeUrl(value) {
-            if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function" && window.isSafeImageSrc !== isSafeHttpOrRelativeUrl) {
+        function isSafeMealUrl(value) {
+            if (typeof window !== "undefined" && typeof window.isSafeImageSrc === "function" && window.isSafeImageSrc !== isSafeMealUrl) {
                 return window.isSafeImageSrc(value);
             }
             if (typeof value !== "string") return false;
@@ -1616,7 +1616,7 @@
             const img = dish.image;
             const cat = normalizeCategoryKey(dish.category);
             const fallbackEmoji = cat === 'nonveg' ? '🍗' : (cat === 'breads' ? '🫓' : (cat === 'drinks' ? '🥛' : '🍛'));
-            if (isSafeHttpOrRelativeUrl(img)) {
+            if (isSafeMealUrl(img)) {
                 const image = makeNode("img");
                 image.setAttribute("src", img);
                 image.setAttribute("alt", dish.name || "Dish");
@@ -1645,7 +1645,7 @@
         /**
          * Fetch menu items from existing /api/menu backend endpoint
          */
-        async function fetchMenuDishes(page = 1) {
+        async function fetchMenuDishes() {
             const loadingState = document.getElementById('dishesLoadingState');
             const errorState = document.getElementById('dishesErrorState');
             const emptyState = document.getElementById('dishesEmptyState');
@@ -1659,23 +1659,35 @@
             container.style.display = 'none';
 
             try {
-                const response = await window.apiFetch(`/api/menu?page=${page}&limit=100`, {
-                    signal: controller.signal
-                });
+                let pageNum = 1;
+                let totalPages = 1;
+                let totalCount = 0;
+                let accumulated = [];
 
-                if (!response.ok) {
-                    throw new Error(`API error (HTTP ${response.status})`);
+                while (pageNum <= totalPages) {
+                    const response = await window.apiFetch(`/api/menu?page=${pageNum}&limit=100`, {
+                        signal: controller.signal
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error (HTTP ${response.status})`);
+                    }
+
+                    const data = await response.json();
+                    if (!Array.isArray(data)) {
+                        throw new Error('Received unexpected data structure from backend menu API');
+                    }
+
+                    accumulated = accumulated.concat(data);
+                    totalPages = Number(response.headers.get("X-Total-Pages")) || 1;
+                    totalCount = Number(response.headers.get("X-Total-Count")) || accumulated.length;
+                    pageNum++;
                 }
 
-                const data = await response.json();
-                if (!Array.isArray(data)) {
-                    throw new Error('Received unexpected data structure from backend menu API');
-                }
-
-                allMenuDishes = data;
-                currentMenuPage = Number(response.headers.get("X-Page")) || page;
-                menuTotalPages = Number(response.headers.get("X-Total-Pages")) || 1;
-                renderPaginationControls("builderMenuPagination", currentMenuPage, menuTotalPages, response.headers.get("X-Total-Count"), fetchMenuDishes);
+                allMenuDishes = accumulated;
+                bymCurrentPage = 1;
+                bymTotalPages = 1;
+                renderPaginationControls("builderMenuPagination", 1, 1, totalCount || allMenuDishes.length, () => fetchMenuDishes());
                 loadingState.style.display = 'none';
 
                 if (allMenuDishes.length === 0) {
@@ -1687,6 +1699,15 @@
                 renderAllDishes();
                 container.style.display = 'block';
                 updateBillUI();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const addDishName = urlParams.get('add');
+                if (addDishName) {
+                    const found = allMenuDishes.find(d => (d.name || '').toLowerCase() === addDishName.toLowerCase());
+                    if (found) {
+                        addDishToPlatter(found.id || found._id);
+                    }
+                }
             } catch (err) {
                 console.error('Failed to load menu dishes:', err);
                 loadingState.style.display = 'none';
@@ -2138,6 +2159,12 @@
                 closeOrderModal();
             }
         }
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeOrderModal();
+            }
+        });
 
         // Initial Boot
         fetchMenuDishes();

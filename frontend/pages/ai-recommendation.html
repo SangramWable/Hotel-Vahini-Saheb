@@ -927,6 +927,16 @@
                 <p>Balancing spices, pairing breads, and matching your budget tier...</p>
             </div>
 
+            <!-- Error State -->
+            <div class="ai-placeholder-state" id="aiErrorBox" style="display: none;">
+                <div class="ai-chef-avatar" style="background: linear-gradient(135deg, #ef4444, #78350f); border-color: #f87171;">⚠️</div>
+                <h4 id="aiErrorTitle" style="color: #fca5a5;">Unable to Load Menu</h4>
+                <p id="aiErrorMessage" style="margin-bottom: 20px;">Could not connect to the menu service. Please check your connection and try again.</p>
+                <button type="button" id="btnAiRetry" class="btn-card-action btn-card-primary" style="margin: 0 auto; display: inline-flex;" onclick="retryFetchMenu()">
+                    <span>🔄 Retry Loading Menu</span>
+                </button>
+            </div>
+
             <!-- Result Card -->
             <div class="recommended-card" id="aiResultCard">
                 <div class="match-badge-bar">
@@ -963,10 +973,10 @@
                 </div>
 
                 <div class="card-actions-row">
-                    <a href="menu.html" class="btn-card-action btn-card-secondary">
+                    <a href="menu.html" class="btn-card-action btn-card-secondary" id="btnViewInMenu">
                         <span>📖 View in Menu</span>
                     </a>
-                    <a href="build-your-meal.html" class="btn-card-action btn-card-primary">
+                    <a href="build-your-meal.html" class="btn-card-action btn-card-primary" id="btnBuildThali">
                         <span>➕ Build Thali</span>
                     </a>
                 </div>
@@ -998,7 +1008,7 @@
         </div>
 
         <div class="quick-picks-grid">
-            <div class="quick-pick-card" onclick="loadPresetRecommendation('mutton')">
+            <div class="quick-pick-card" role="button" tabindex="0" aria-label="Select Mutton Rassa Feast recommendation" onclick="loadPresetRecommendation('mutton')">
                 <div class="quick-pick-icon">🍗</div>
                 <div class="quick-pick-meta">
                     <h4>Mutton Rassa Feast</h4>
@@ -1007,7 +1017,7 @@
                 </div>
             </div>
 
-            <div class="quick-pick-card" onclick="loadPresetRecommendation('thali')">
+            <div class="quick-pick-card" role="button" tabindex="0" aria-label="Select Royal Maharashtrian Thali recommendation" onclick="loadPresetRecommendation('thali')">
                 <div class="quick-pick-icon">🍛</div>
                 <div class="quick-pick-meta">
                     <h4>Royal Maharashtrian Thali</h4>
@@ -1016,7 +1026,7 @@
                 </div>
             </div>
 
-            <div class="quick-pick-card" onclick="loadPresetRecommendation('pithla')">
+            <div class="quick-pick-card" role="button" tabindex="0" aria-label="Select Chulivarcha Pithla Bhakri recommendation" onclick="loadPresetRecommendation('pithla')">
                 <div class="quick-pick-icon">🫓</div>
                 <div class="quick-pick-meta">
                     <h4>Chulivarcha Pithla Bhakri</h4>
@@ -1071,17 +1081,87 @@
 <script src="../assets/js/script.js"></script>
 
 <script>
-const isSafeImageSrc = window.isSafeImageSrc || function(val) {
-    if (typeof val !== "string") return false;
-    const trimmed = val.trim();
-    if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
-    if (!trimmed || /[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
-    try {
-        const parsed = new URL(trimmed, window.location.href);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-    } catch { return false; }
+// ==========================================
+// STATE MANAGEMENT & DATA FETCHING
+// ==========================================
+let aiMenuDishes = [];
+let aiIsFetching = false;
+window.clearAiMenuCache = function() {
+    aiMenuDishes = [];
 };
-const isSafeHttpOrRelativeUrl = isSafeImageSrc;
+
+async function fetchAiMenuDishes() {
+    if (aiIsFetching) return aiMenuDishes;
+    aiIsFetching = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    try {
+        let pageNum = 1;
+        let totalPages = 1;
+        let accumulated = [];
+
+        while (pageNum <= totalPages) {
+            const response = await window.apiFetch(`/api/menu?page=${pageNum}&limit=100`, {
+                signal: controller.signal
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error (HTTP ${response.status})`);
+            }
+
+            const data = await response.json();
+            if (!Array.isArray(data)) {
+                throw new Error("Received unexpected data structure from backend menu API");
+            }
+
+            accumulated = accumulated.concat(data);
+            totalPages = Number(response.headers.get("X-Total-Pages")) || 1;
+            pageNum++;
+        }
+
+        aiMenuDishes = accumulated;
+        hideErrorState();
+        return aiMenuDishes;
+    } catch (err) {
+        console.error("AI recommendation menu fetch failed:", err);
+        throw err;
+    } finally {
+        clearTimeout(timeoutId);
+        aiIsFetching = false;
+    }
+}
+
+function showErrorState(err) {
+    const placeholder = document.getElementById('aiPlaceholderState');
+    const loader = document.getElementById('aiLoadingBox');
+    const resultCard = document.getElementById('aiResultCard');
+    const errorBox = document.getElementById('aiErrorBox');
+    const errorMsg = document.getElementById('aiErrorMessage');
+
+    if (placeholder) placeholder.style.display = 'none';
+    if (loader) loader.style.display = 'none';
+    if (resultCard) resultCard.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'block';
+
+    if (errorMsg) {
+        const reason = (err && err.name === "AbortError")
+            ? "Request timed out while connecting to the menu API (15-second limit)."
+            : (err && err.message)
+                ? err.message
+                : "Unable to load menu dishes. Please try again.";
+        errorMsg.textContent = `Could not load dishes from /api/menu: ${reason}`;
+    }
+}
+
+function hideErrorState() {
+    const errorBox = document.getElementById('aiErrorBox');
+    if (errorBox) errorBox.style.display = 'none';
+}
+
+async function retryFetchMenu() {
+    await generateRecommendation();
+}
 
 // ==========================================
 // INTERACTIVE AI CHIPS SELECTION & LOGIC
@@ -1113,291 +1193,293 @@ document.querySelectorAll(".choice-chip").forEach(chip => {
     });
 });
 
+document.querySelectorAll(".quick-pick-card").forEach(card => {
+    card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            card.click();
+        }
+    });
+});
+
 function getSelectedValue(groupId) {
     const activeChip = document.querySelector(`#${groupId} .choice-chip.active`);
     return activeChip ? activeChip.dataset.val : '';
 }
 
-// Culinary database for dynamic recommendation matching
-const CULINARY_RECOMMENDATIONS = {
-    // Non-Veg combinations
-    "nonveg_spicy_high": {
-        name: "Kolhapuri Mutton Rassa Thali",
-        icon: "🍗",
-        image: "../assets/images/vahinisaheb4.jpeg",
-        price: "₹360.00",
-        score: "99% Perfect Match",
-        badge: "ROYAL CHEF SIGNATURE",
-        notes: "Fiery Tambda & Pandhra Rassa accompanied with tender Kolhapuri spiced mutton, slow cooked over chulha flame.",
-        pairing: "Hot Bajra Bhakri, Thecha & Chilled Solkadhi",
-        related: [
-            { name: "Mutton Vahinisaheb Thali", price: "₹580.00", image: "../assets/images/vahinisaheb4.jpeg", desc: "Grand Royal Feast" },
-            { name: "Gavran Chicken Thali", price: "₹290.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Village Desi Chicken" },
-            { name: "Chicken Kharda Fry Plate", price: "₹290.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Green Chilli Thecha Sukka" }
-        ]
-    },
-    "nonveg_spicy_medium": {
-        name: "Kolhapuri Chicken Masala",
-        icon: "🍗",
-        image: "../assets/images/vahinisaheb5.jpeg",
-        price: "₹260.00",
-        score: "96% Perfect Match",
-        badge: "SPICY FAVORITE",
-        notes: "Succulent chicken morsels immersed in aromatic roasted coconut and stone-ground Maharashtrian spices.",
-        pairing: "Tawa Chapati & Spiced Buttermilk (Taak)",
-        related: [
-            { name: "Chicken Vahinisaheb Thali", price: "₹470.00", image: "../assets/images/vahinisaheb2.jpeg", desc: "Royal Handi & Thali" },
-            { name: "Chicken Sadhi Thali", price: "₹300.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Medium Spicy Gravy" },
-            { name: "Chicken Garlic Fry Plate", price: "₹280.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Crispy Golden Garlic" }
-        ]
-    },
-    "nonveg_mild_high": {
-        name: "Special Malvani Chicken Curry",
-        icon: "🍲",
-        image: "../assets/images/vahinisaheb5.jpeg",
-        price: "₹310.00",
-        score: "94% Flavor Match",
-        badge: "BALANCED FLAVOURS",
-        notes: "Mildly spiced fragrant chicken gravy gently simmered with fresh coconut milk and coriander.",
-        pairing: "Steamed Rice & Soft Phulkas",
-        related: [
-            { name: "Chicken Handi (Half)", price: "₹450.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Rich Coconut Milk Gravy" },
-            { name: "Gavran Ukhar Plate", price: "₹310.00", image: "../assets/images/vahinsaheb1.jpeg", desc: "Mild Turmeric Soup Broth" },
-            { name: "Chicken Soup Bowl", price: "₹120.00", image: "../assets/images/vahinisaheb7.jpeg", desc: "Warm Traditional Soup" }
-        ]
-    },
-    "nonveg_mild_medium": {
-        name: "Maharashtrian Egg Curry Thali",
-        icon: "🥚",
-        image: "../assets/images/vahinisaheb2.jpeg",
-        price: "₹220.00",
-        score: "92% Flavor Match",
-        badge: "CLASSIC TASTE",
-        notes: "Golden eggs simmered in onion-tomato gravy with delicate Maharashtrian spices.",
-        pairing: "Hot Jowar Bhakri & Sliced Onions",
-        related: [
-            { name: "Chicken Ukhar Plate", price: "₹240.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Tender Mild Broth Plate" },
-            { name: "Kolhapuri Egg Masala", price: "₹160.00", image: "../assets/images/vahinisaheb4.jpeg", desc: "Homestyle Rustic Curry" },
-            { name: "Chicken Sadhi Thali", price: "₹300.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Comforting Thali Meal" }
-        ]
-    },
-    "nonveg_low": {
-        name: "Kolhapuri Egg Masala",
-        icon: "🥚",
-        image: "../assets/images/vahinisaheb5.jpeg",
-        price: "₹160.00",
-        score: "90% Value Match",
-        badge: "BUDGET DELIGHT",
-        notes: "Hearty and rustic egg curry made with homemade goda masala for a satisfying comfort meal.",
-        pairing: "2 Fresh Chapatis & Lemon Wedges",
-        related: [
-            { name: "Chicken Soup Bowl", price: "₹120.00", image: "../assets/images/vahinisaheb7.jpeg", desc: "Nutritious Hot Soup" },
-            { name: "Egg Bhurji & Chapati", price: "₹140.00", image: "../assets/images/vahinisaheb2.jpeg", desc: "Quick Fresh Bite" },
-            { name: "Plane Soup Bowl (Chicken)", price: "₹60.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Light Clear Broth" }
-        ]
-    },
+// ==========================================
+// SCORING ENGINE GROUNDED IN REAL MENU DATA
+// ==========================================
+function scoreDishForPreferences(dish, preferences) {
+    const { type, spice, vibe, budget } = preferences;
+    const dishName = (dish.name || '').toLowerCase();
+    const dishDesc = (dish.description || '').toLowerCase();
+    const dishCat = (dish.category || '').toLowerCase();
+    const price = typeof dish.price === 'number' ? dish.price : parseFloat(dish.price) || 0;
 
-    // Veg combinations
-    "veg_spicy_high": {
-        name: "Special Kolhapuri Misal & Veg Feast",
-        icon: "🍲",
-        image: "../assets/images/vahinsaheb3.jpeg",
-        price: "₹320.00",
-        score: "97% Match",
-        badge: "FIERY VEG SIGNATURE",
-        notes: "Zesty sprouted bean curry topped with crisp farsan and fierce Kolhapuri cut, served with royal sides.",
-        pairing: "Pav, Dahi & Gulab Jamun",
-        related: [
-            { name: "Maswadi Vahinisaheb Special Thali", price: "₹320.00", image: "../assets/images/vahinsaheb3.jpeg", desc: "Signature Royal Maswadi" },
-            { name: "Maswadi Fry Full Handi", price: "₹450.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Roasted Black Masala" },
-            { name: "Shevbhaji Handi", price: "₹240.00", image: "../assets/images/vahinisaheb2.jpeg", desc: "Fiery Khandeshi Gravy" }
-        ]
-    },
-    "veg_spicy_medium": {
-        name: "Bharli Vangi (Stuffed Brinjal)",
-        icon: "🍆",
-        image: "../assets/images/vahinsaheb3.jpeg",
-        price: "₹190.00",
-        score: "98% Match",
-        badge: "TRADITIONAL FAVORITE",
-        notes: "Baby eggplants slow-cooked in a rich roasted peanut, sesame, and dry coconut masala gravy.",
-        pairing: "Piping Hot Jowar Bhakri & Raw Onion",
-        related: [
-            { name: "Maswadi Thali", price: "₹280.00", image: "../assets/images/vahinsaheb3.jpeg", desc: "Gramflour Stuffed Rolls" },
-            { name: "Paneer Tikka Masala", price: "₹240.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Charred Spiced Paneer" },
-            { name: "Chulivarcha Pithla Bhakri", price: "₹180.00", image: "../assets/images/vahinsaheb1.jpeg", desc: "Rustic Chulha Flavor" }
-        ]
-    },
-    "veg_mild_high": {
-        name: "Grand Maharashtrian Veg Thali",
-        icon: "🍛",
-        image: "../assets/images/vahinisaheb2.jpeg",
-        price: "₹280.00",
-        score: "99% Royal Match",
-        badge: "BESTSELLER THALI",
-        notes: "Complete feast featuring 2 seasonal sabzis, dal amti, koshimbir, sweet puran poli, rice and papad.",
-        pairing: "Steamed Basmati Rice & Desi Ghee",
-        related: [
-            { name: "Maswadi Vahinisaheb Special Thali", price: "₹320.00", image: "../assets/images/vahinsaheb3.jpeg", desc: "Signature Maswadi Roll" },
-            { name: "Kaju Paneer Masala", price: "₹260.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Rich Cashew & Cream" },
-            { name: "Dal Tadka & Jeera Rice", price: "₹190.00", image: "../assets/images/vahinsaheb1.jpeg", desc: "Comfort Classic Dal" }
-        ]
-    },
-    "veg_low": {
-        name: "Chulivarcha Pithla Bhakri",
-        icon: "🫓",
-        image: "../assets/images/vahinsaheb1.jpeg",
-        price: "₹160.00",
-        score: "96% Value Match",
-        badge: "AUTHENTIC RUSTIC",
-        notes: "Gram flour seasoned with mustard, green chillies, garlic and fresh coriander. The soul of rural Maharashtra.",
-        pairing: "Fresh Bajra Bhakri, Spicy Thecha & Taak",
-        related: [
-            { name: "Maswadi Vati", price: "₹90.00", image: "../assets/images/vahinsaheb3.jpeg", desc: "Traditional Side Dish" },
-            { name: "Shevbhaji Plate", price: "₹150.00", image: "../assets/images/vahinisaheb2.jpeg", desc: "Khandeshi Spicy Gravy" },
-            { name: "Bajra Bhakri with Thecha", price: "₹80.00", image: "../assets/images/vahinsaheb1.jpeg", desc: "Green Chilli Thecha" }
-        ]
-    },
+    const coastalKeywords = ['surmai', 'paplet', 'bombil', 'fish', 'prawn', 'kolambi', 'khekada', 'crab', 'malvani', 'konkani', 'sukat', 'bangda', 'seafood'];
+    const isCoastal = coastalKeywords.some(kw => dishName.includes(kw) || dishDesc.includes(kw));
 
-    // Coastal / Fish
-    "coastal_high": {
-        name: "Konkani Surmai Fry & Fish Thali",
-        icon: "🐟",
-        image: "../assets/images/vahinisaheb8.jpeg",
-        price: "₹380.00",
-        score: "98% Coastal Match",
-        badge: "COASTAL TREASURE",
-        notes: "Crisp rava-crusted Kingfish accompanied by fragrant kokum fish curry and steamed rice.",
-        pairing: "Authentic Pink Solkadhi & Bhakri",
-        related: [
-            { name: "Khekada (Crab) Thali", price: "₹420.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Fresh Coastal Crab" },
-            { name: "Konkani Fish Curry", price: "₹290.00", image: "../assets/images/vahinisaheb7.jpeg", desc: "Kokum & Coconut Curry" },
-            { name: "Sukat Plate", price: "₹180.00", image: "../assets/images/vahinisaheb4.jpeg", desc: "Coastal Dried Prawns" }
-        ]
-    },
-    "coastal_medium": {
-        name: "Konkani Fish Curry",
-        icon: "🐟",
-        image: "../assets/images/vahinisaheb7.jpeg",
-        price: "₹290.00",
-        score: "94% Flavor Match",
-        badge: "SEAFOOD SPECIAL",
-        notes: "Coastal fish cooked in tangy kokum and coconut milk gravy, bursting with coastal freshness.",
-        pairing: "Steamed White Rice & Fresh Lime",
-        related: [
-            { name: "Konkani Surmai Fry", price: "₹380.00", image: "../assets/images/vahinisaheb8.jpeg", desc: "Crisp Rava Kingfish" },
-            { name: "Fish Thali Special", price: "₹350.00", image: "../assets/images/vahinisaheb6.jpeg", desc: "Served with Solkadhi" },
-            { name: "Khekada Handi", price: "₹460.00", image: "../assets/images/vahinisaheb5.jpeg", desc: "Chulha Crab Curry" }
-        ]
+    let categoryFit = 0;
+    if (type === 'coastal') {
+        if (isCoastal) categoryFit = 40;
+        else if (dishCat === 'nonveg') categoryFit = 10;
+        else categoryFit = -30;
+    } else if (type === 'veg') {
+        if (dishCat === 'veg') categoryFit = 40;
+        else categoryFit = -60;
+    } else if (type === 'nonveg') {
+        if (dishCat === 'nonveg' && !isCoastal) categoryFit = 40;
+        else if (dishCat === 'nonveg') categoryFit = 25;
+        else categoryFit = -60;
     }
-};
 
-function generateRecommendation() {
-    const type = getSelectedValue('typeGroup');
-    const spice = getSelectedValue('spiceGroup');
-    const budget = getSelectedValue('budgetGroup');
-    const vibe = getSelectedValue('vibeGroup');
+    if (categoryFit < 0) return -1;
 
+    let score = 50 + categoryFit;
+
+    // Budget matching
+    if (budget === 'low') {
+        if (price < 180) score += 20;
+        else if (price <= 250) score += 8;
+        else score -= 10;
+    } else if (budget === 'medium') {
+        if (price >= 180 && price <= 300) score += 20;
+        else if (price < 180) score += 10;
+        else score += 5;
+    } else if (budget === 'high') {
+        if (price > 300) score += 20;
+        else if (price >= 240) score += 12;
+        else score += 5;
+    }
+
+    // Spice matching
+    const fieryKeywords = ['kolhapuri', 'rassa', 'tambda', 'kharda', 'thecha', 'sukka', 'chilli', 'tikhat', 'shevbhaji', 'masala', 'handi'];
+    const mildKeywords = ['soup', 'alani', 'ukhar', 'dal', 'fry', 'pithla', 'sadhi', 'rice', 'bhakri', 'curry'];
+
+    const hasFiery = fieryKeywords.some(kw => dishName.includes(kw) || dishDesc.includes(kw));
+    const hasMild = mildKeywords.some(kw => dishName.includes(kw) || dishDesc.includes(kw));
+
+    if (spice === 'spicy') {
+        if (hasFiery) score += 15;
+        else if (!hasMild) score += 8;
+    } else if (spice === 'mild') {
+        if (hasMild && !hasFiery) score += 15;
+        else if (!hasFiery) score += 8;
+    } else { // medium
+        score += 10;
+        if (hasFiery || hasMild) score += 5;
+    }
+
+    // Vibe / Occasion matching
+    const royalKeywords = ['thali', 'vahinisaheb', 'special', 'handi', 'feast'];
+    const quickKeywords = ['fry', 'plate', 'rice', 'masala', 'soup', 'bhurji', 'egg'];
+    const healthyKeywords = ['bhakri', 'pithla', 'alani', 'ukhar', 'dal', 'gavran', 'salad'];
+
+    if (vibe === 'royal' && royalKeywords.some(kw => dishName.includes(kw))) score += 12;
+    if (vibe === 'quick' && quickKeywords.some(kw => dishName.includes(kw))) score += 12;
+    if (vibe === 'healthy' && healthyKeywords.some(kw => dishName.includes(kw))) score += 12;
+
+    return score;
+}
+
+// ==========================================
+// RECOMMENDATION GENERATION
+// ==========================================
+async function generateRecommendation() {
     const placeholder = document.getElementById('aiPlaceholderState');
     const loader = document.getElementById('aiLoadingBox');
     const resultCard = document.getElementById('aiResultCard');
+    hideErrorState();
 
-    placeholder.style.display = 'none';
-    resultCard.style.display = 'none';
-    loader.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    if (resultCard) resultCard.style.display = 'none';
+    if (loader) loader.style.display = 'block';
 
-    // Simulate AI model reasoning and synthesis
-    setTimeout(() => {
-        loader.style.display = 'none';
+    try {
+        if (!aiMenuDishes || aiMenuDishes.length === 0) {
+            await fetchAiMenuDishes();
+        }
 
-        // Match resolution
-        let key = `${type}_${spice}_${budget}`;
-        let matched = CULINARY_RECOMMENDATIONS[key];
+        if (!aiMenuDishes || aiMenuDishes.length === 0) {
+            throw new Error("No menu dishes returned from /api/menu");
+        }
 
-        if (!matched) {
+        const type = getSelectedValue('typeGroup') || 'veg';
+        const spice = getSelectedValue('spiceGroup') || 'medium';
+        const budget = getSelectedValue('budgetGroup') || 'medium';
+        const vibe = getSelectedValue('vibeGroup') || 'royal';
+
+        const scored = aiMenuDishes.map(dish => ({
+            dish,
+            score: scoreDishForPreferences(dish, { type, spice, vibe, budget })
+        }));
+
+        let candidates = scored.filter(s => s.score > 0).sort((a, b) => b.score - a.score);
+
+        if (candidates.length === 0) {
+            const fallbackCategory = type === 'veg' ? 'veg' : 'nonveg';
+            const fallbackList = aiMenuDishes.filter(d => (d.category || '').toLowerCase() === fallbackCategory);
+            candidates = (fallbackList.length > 0 ? fallbackList : aiMenuDishes).map(d => ({ dish: d, score: 75 }));
+        }
+
+        const topPick = candidates[0];
+        const topDish = topPick.dish;
+        const topScore = topPick.score;
+
+        let badge = "PERFECT FLAVOR MATCH";
+        if (topScore >= 95) badge = "ROYAL CHEF SIGNATURE";
+        else if (spice === 'spicy') badge = "SPICY KOLHAPURI SPECIAL";
+        else if (budget === 'high') badge = "CHEF'S SIGNATURE CHOICE";
+
+        const matchPercent = Math.min(99, Math.max(89, Math.round(topScore * 0.95)));
+        const scoreText = `${matchPercent}% Flavor Match`;
+
+        const rawDesc = (topDish.description || '').trim();
+        const hasCustomDesc = rawDesc && !/^no description provided\.?$/i.test(rawDesc);
+        let notes = hasCustomDesc ? rawDesc : "";
+        if (!notes) {
             if (type === 'coastal') {
-                matched = budget === 'high' ? CULINARY_RECOMMENDATIONS["coastal_high"] : CULINARY_RECOMMENDATIONS["coastal_medium"];
+                notes = "Fresh coastal delicacy gently seasoned with roasted coconut, kokum, and warm Konkani coastal spices.";
             } else if (type === 'nonveg') {
-                matched = budget === 'high' ? CULINARY_RECOMMENDATIONS["nonveg_spicy_high"] : CULINARY_RECOMMENDATIONS["nonveg_spicy_medium"];
+                notes = "Traditional slow-simmered specialty crafted with fragrant home-pounded masalas and tender cuts for rich Kolhapuri depth.";
             } else {
-                matched = budget === 'low' ? CULINARY_RECOMMENDATIONS["veg_low"] : CULINARY_RECOMMENDATIONS["veg_mild_high"];
+                notes = "Authentic rustic preparation cooked with fresh seasonal ingredients, roasted spices, and classic Maharashtrian aroma.";
             }
         }
 
-        renderDishDetails(matched);
-        resultCard.style.display = 'block';
-    }, 750);
+        let pairing = "Hot Jowar Bhakri, Thecha & Chilled Spiced Taak";
+        if (type === 'coastal') {
+            pairing = "Pink Solkadhi & Steamed Indrayani Rice";
+        } else if (type === 'nonveg') {
+            pairing = "Hot Bajra Bhakri, Tambda-Pandhra Rassa & Onion Salad";
+        }
+
+        const allRankedDishes = candidates.map(c => c.dish);
+        const recommendedDish = {
+            ...topDish,
+            score: scoreText,
+            badge: badge,
+            notes: notes,
+            pairing: pairing
+        };
+
+        if (loader) loader.style.display = 'none';
+        renderDishDetails(recommendedDish, allRankedDishes);
+        if (resultCard) resultCard.style.display = 'block';
+
+    } catch (err) {
+        console.error("Failed to generate recommendation:", err);
+        showErrorState(err);
+    }
 }
 
 // Render Dish Details and its Related Dishes
-function renderDishDetails(dish) {
-    // Populate text details
-    document.getElementById('dishNameDisplay').textContent = dish.name;
-    document.getElementById('dishPriceDisplay').textContent = dish.price;
-    document.getElementById('matchScoreText').textContent = dish.score || "98% Match";
-    document.getElementById('categoryBadgeText').textContent = dish.badge || "RECOMMENDED";
-    document.getElementById('dishNotesDisplay').textContent = dish.notes;
-    document.getElementById('dishPairingDisplay').textContent = dish.pairing;
+function renderDishDetails(dish, allRankedDishes = []) {
+    document.getElementById('dishNameDisplay').textContent = dish.name || "Special Dish";
+    const priceNum = typeof dish.price === 'number' ? dish.price : parseFloat(dish.price) || 0;
+    document.getElementById('dishPriceDisplay').textContent = `₹${priceNum.toFixed(2)}`;
+    document.getElementById('matchScoreText').textContent = dish.score || "98% Flavor Match";
+    document.getElementById('categoryBadgeText').textContent = dish.badge || "CHEF RECOMMENDED";
+    document.getElementById('dishNotesDisplay').textContent = dish.notes || (dish.description ? dish.description : "Authentic Maharashtrian preparation with slow-roasted spices and rich aroma.");
+    document.getElementById('dishPairingDisplay').textContent = dish.pairing || "Hot Jowar Bhakri & Chilled Spiced Taak";
 
-    // Populate Dish Image
+    const btnView = document.getElementById('btnViewInMenu');
+    if (btnView) {
+        btnView.href = `menu.html?search=${encodeURIComponent(dish.name || '')}`;
+    }
+    const btnBuild = document.getElementById('btnBuildThali');
+    if (btnBuild) {
+        btnBuild.href = `build-your-meal.html?add=${encodeURIComponent(dish.name || '')}`;
+    }
+
     const imgDisplay = document.getElementById('dishImageDisplay');
     const iconDisplay = document.getElementById('dishIconDisplay');
-    if (isSafeHttpOrRelativeUrl(dish.image)) {
-        imgDisplay.setAttribute("src", dish.image);
+    const imgSrc = dish.image || dish.image_url || dish.photo;
+    if (isSafeHttpOrRelativeUrl(imgSrc)) {
+        imgDisplay.setAttribute("src", imgSrc);
         imgDisplay.setAttribute("alt", dish.name || "Recommended dish");
         imgDisplay.style.display = 'block';
         iconDisplay.style.display = 'none';
     } else {
         imgDisplay.style.display = 'none';
-        iconDisplay.textContent = dish.icon || '🍛';
+        iconDisplay.textContent = dish.icon || (dish.category === 'veg' ? '🌱' : '🍗');
         iconDisplay.style.display = 'block';
     }
 
-    // Populate More Related Dishes
     const relatedList = document.getElementById('relatedDishesList');
     const relatedCountTag = document.getElementById('relatedCountTag');
     if (relatedList) {
         relatedList.replaceChildren();
-        const relItems = dish.related || [];
-        if (relatedCountTag) relatedCountTag.textContent = `${relItems.length} Choices`;
+        const related = (dish.related && dish.related.length > 0)
+            ? dish.related
+            : allRankedDishes.filter(d => (d.name || d._id) !== (dish.name || dish._id)).slice(0, 3);
 
-        relItems.forEach(item => {
+        if (relatedCountTag) relatedCountTag.textContent = `${related.length} Suggestions`;
+
+        related.forEach(item => {
             const div = document.createElement('div');
             div.className = 'related-dish-item';
-            div.addEventListener("click", () => selectRelatedDish(item, dish));
+            div.setAttribute("role", "button");
+            div.setAttribute("tabindex", "0");
+            div.setAttribute("aria-label", `Select related dish ${item.name}`);
+
+            const activate = () => selectRelatedDish(item, dish, allRankedDishes);
+            div.addEventListener("click", activate);
+            div.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    activate();
+                }
+            });
+
             const left = document.createElement("div");
             left.className = "related-dish-left";
+
             const thumb = document.createElement("div");
             thumb.className = "related-dish-thumb";
-            if (isSafeHttpOrRelativeUrl(item.image)) {
+            const relImgSrc = item.image || item.image_url || item.photo;
+            if (isSafeHttpOrRelativeUrl(relImgSrc)) {
                 const image = document.createElement("img");
-                image.setAttribute("src", item.image);
+                image.setAttribute("src", relImgSrc);
                 image.setAttribute("alt", item.name || "Related dish");
-                image.addEventListener("error", () => { thumb.textContent = "🍲"; }, { once: true });
+                image.addEventListener("error", () => {
+                    thumb.replaceChildren();
+                    const fb = document.createElement("span");
+                    fb.className = "thumb-emoji";
+                    fb.textContent = item.category === 'veg' ? "🌱" : "🍲";
+                    thumb.appendChild(fb);
+                }, { once: true });
                 thumb.appendChild(image);
             } else {
                 const emoji = document.createElement("span");
                 emoji.className = "thumb-emoji";
-                emoji.textContent = "🍲";
+                emoji.textContent = item.category === 'veg' ? "🌱" : "🍲";
                 thumb.appendChild(emoji);
             }
+
             const info = document.createElement("div");
             info.className = "related-dish-info";
             const title = document.createElement("h6");
             title.textContent = item.name || "";
             const description = document.createElement("p");
-            description.textContent = item.desc || "Maharashtrian Special";
+            const itemDesc = item.desc || item.description || "";
+            const cleanDesc = (/^no description provided\.?$/i.test(itemDesc) || !itemDesc) ? "Authentic Maharashtrian flavor" : itemDesc;
+            description.textContent = cleanDesc;
             info.append(title, description);
             left.append(thumb, info);
+
             const right = document.createElement("div");
             right.className = "related-dish-right";
             const price = document.createElement("span");
             price.className = "related-dish-price";
-            price.textContent = item.price || "";
+            const relPriceNum = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+            price.textContent = `₹${relPriceNum.toFixed(2)}`;
             const view = document.createElement("span");
             view.className = "btn-view-related";
             view.textContent = "View ➔";
             right.append(price, view);
+
             div.append(left, right);
             relatedList.appendChild(div);
         });
@@ -1405,20 +1487,32 @@ function renderDishDetails(dish) {
 }
 
 // Click handler to swap related dish into main spotlight
-function selectRelatedDish(item, originalDish) {
-    const swappedDish = {
-        name: item.name,
-        price: item.price,
-        image: item.image,
-        icon: originalDish.icon || '🍲',
+function selectRelatedDish(item, currentDish, allRankedDishes) {
+    const cat = item.category || currentDish.category;
+    const isCoastal = /surmai|fish|paplet|bombil|crab|prawn|kolambi/i.test(item.name || "");
+    const pairing = isCoastal
+        ? "Pink Solkadhi & Steamed Indrayani Rice"
+        : (cat === 'veg' ? "Hot Jowar Bhakri, Thecha & Chilled Spiced Taak" : "Hot Bajra Bhakri, Tambda-Pandhra Rassa & Onion Salad");
+
+    const desc = item.description || item.desc || "";
+    const cleanDesc = (/^no description provided\.?$/i.test(desc) || !desc)
+        ? `हॉटेल वहिनीसाहेब चा लोकप्रिय पदार्थ - अस्सल पारंपरिक चवीसह!`
+        : desc;
+
+    const swapped = {
+        ...item,
         score: "96% Palate Match",
-        badge: "RELATED SELECTION",
-        notes: `हॉटेल वहिनीसाहेब चा आणखी एक लोकप्रिय पदार्थ! ${item.desc || ''} - अस्सल पारंपरिक चवीसह.`,
-        pairing: originalDish.pairing || "Hot Bhakri & Taak",
-        related: originalDish.related ? originalDish.related.filter(r => r.name !== item.name) : []
+        badge: "POPULAR SELECTION",
+        notes: cleanDesc,
+        pairing: pairing,
+        related: allRankedDishes.filter(d => (d.name || d._id) !== (item.name || item._id)).slice(0, 3)
     };
-    renderDishDetails(swappedDish);
-    document.getElementById('aiResultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    renderDishDetails(swapped, allRankedDishes);
+    const card = document.getElementById('aiResultCard');
+    if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 }
 
 // Preset Quick Picks Click Handler
@@ -1427,14 +1521,17 @@ function loadPresetRecommendation(type) {
         setChipVal('typeGroup', 'nonveg');
         setChipVal('spiceGroup', 'spicy');
         setChipVal('budgetGroup', 'high');
+        setChipVal('vibeGroup', 'royal');
     } else if (type === 'thali') {
         setChipVal('typeGroup', 'veg');
         setChipVal('spiceGroup', 'medium');
         setChipVal('budgetGroup', 'medium');
+        setChipVal('vibeGroup', 'royal');
     } else if (type === 'pithla') {
         setChipVal('typeGroup', 'veg');
         setChipVal('spiceGroup', 'mild');
         setChipVal('budgetGroup', 'low');
+        setChipVal('vibeGroup', 'healthy');
     }
     generateRecommendation();
     window.scrollTo({ top: 200, behavior: 'smooth' });
@@ -1446,11 +1543,19 @@ function setChipVal(groupId, val) {
     container.querySelectorAll('.choice-chip').forEach(c => {
         if (c.dataset.val === val) {
             c.classList.add('active');
+            c.setAttribute("aria-pressed", "true");
         } else {
             c.classList.remove('active');
+            c.setAttribute("aria-pressed", "false");
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAiMenuDishes().catch(err => {
+        console.warn("Background AI menu pre-fetch failed:", err.message);
+    });
+});
 </script>
 
 </body>
