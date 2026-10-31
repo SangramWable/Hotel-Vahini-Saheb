@@ -321,6 +321,14 @@ function renderMenuItems(items, fallbackReason = null) {
 
         card.dataset.category = filterCategory;
 
+        const image = document.createElement("div");
+        image.className = "food-img";
+
+        const titleTag = document.createElement("span");
+        titleTag.className = "food-img-title";
+        titleTag.textContent = item.name || "Authentic Dish";
+        image.appendChild(titleTag);
+
         const info = document.createElement("div");
         info.className = "food-info";
 
@@ -347,7 +355,7 @@ function renderMenuItems(items, fallbackReason = null) {
         }
 
         info.append(name, description, bottom);
-        card.appendChild(info);
+        card.append(image, info);
         menuGrid.appendChild(card);
     });
 
