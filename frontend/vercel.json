@@ -5,6 +5,10 @@
       "destination": "https://hotel-vahini-saheb.onrender.com/api/:path*"
     },
     {
+      "source": "/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
       "source": "/",
       "destination": "/pages/index.html"
     },
