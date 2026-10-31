@@ -15,6 +15,7 @@ function validateImageSrc(value) {
     if (!trimmed) return false;
     if (/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(trimmed)) return true;
     if (/[\u0000-\u0020\\]/.test(trimmed) || trimmed.startsWith("//")) return false;
+    if (!/^(?:https?:\/\/|\/|\.\/|\.\.\/)/.test(trimmed)) return false;
     try {
         const base = (typeof window !== "undefined" && window.location && window.location.href)
             ? window.location.href
@@ -276,7 +277,7 @@ function renderMenuItems(items, fallbackReason = null) {
         retryButton.type = "button";
         retryButton.textContent = "🔄 Sync Database";
         retryButton.style.cssText = "background:#d4af37;color:#120b06;border:none;padding:6px 14px;border-radius:15px;font-weight:700;cursor:pointer;";
-        retryButton.addEventListener("click", loadMenuFromDatabase);
+        retryButton.addEventListener("click", () => loadMenuFromDatabase(1));
         notice.append(noticeText, retryButton);
         menuGrid.appendChild(notice);
     }
@@ -379,6 +380,15 @@ function renderMenuItems(items, fallbackReason = null) {
         const name = document.createElement("h3");
         name.textContent = item.name || "Unnamed dish";
 
+        const bottom = document.createElement("div");
+        bottom.className = "food-bottom";
+
+        const price = document.createElement("span");
+        price.className = "price";
+        const priceNum = typeof item.price === "number" ? item.price : parseFloat(item.price) || 0;
+        price.textContent = `₹${priceNum.toFixed(2)}`;
+        bottom.appendChild(price);
+
         const rawDesc = (item.description || "").trim();
         const isPlaceholder = !rawDesc || /^no description provided\.?$/i.test(rawDesc);
         if (!isPlaceholder) {
@@ -415,53 +425,106 @@ async function loadMenuFromDatabase(page = 1) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
+    let menuItems = null;
+    let pageHeaders = {};
+    let fetchError = null;
+
+    // STEP 1: FETCH STEP
     try {
         const response = await fetchApi(`/api/menu?page=${page}&limit=100`, {
             signal: controller.signal
         });
         if (!response.ok) {
-            const error = new Error(`API error (HTTP ${response.status})`);
+            const error = new Error(`Could not reach the menu server (${response.status})`);
             error.status = response.status;
             throw error;
         }
 
-        const menuItems = await response.json();
-        if (!Array.isArray(menuItems)) {
-            throw new Error("API error (invalid menu response)");
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+            const error = new Error("Could not reach the menu server (invalid response)");
+            error.status = "invalid response";
+            throw error;
         }
 
-        if (menuItems.length === 0) {
-            throw new Error("EMPTY_MENU_LIST");
-        }
-
-        databaseMenuItems = menuItems;
-        currentMenuPage = Number(response.headers.get("X-Page")) || page;
-        menuTotalPages = Number(response.headers.get("X-Total-Pages")) || 1;
-        renderMenuItems(databaseMenuItems);
-        if (typeof renderPaginationControls === "function") {
-            renderPaginationControls("menuPagination", currentMenuPage, menuTotalPages, response.headers.get("X-Total-Count"), loadMenuFromDatabase);
-        }
-        console.log("Menu successfully loaded from MongoDB Atlas:", databaseMenuItems.length, "dishes");
+        menuItems = data;
+        pageHeaders = {
+            page: Number(response.headers.get("X-Page")) || page,
+            totalPages: Number(response.headers.get("X-Total-Pages")) || 1,
+            totalCount: response.headers.get("X-Total-Count")
+        };
     } catch (error) {
-        const fallbackReason = error.message === "EMPTY_MENU_LIST"
-            ? "API returned an empty list."
-            : error.name === "AbortError"
-                ? "API request timed out (15-second limit)."
-                : error.status
-                    ? error.message
-                    : error instanceof TypeError
-                        ? "API error (network request failed)."
-                        : error.message;
+        fetchError = error;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+
+    // Handle Fetch Failures (real API failure, network error, or timeout)
+    if (fetchError) {
+        const fallbackReason = fetchError.status
+            ? `Could not reach the menu server (${fetchError.status})`
+            : fetchError.name === "AbortError"
+                ? "Could not reach the menu server (timeout)"
+                : fetchError instanceof TypeError
+                    ? "Could not reach the menu server (network error)"
+                    : `Could not reach the menu server (${fetchError.message || "error"})`;
+
         console.warn("Menu API unavailable; showing fallback preview:", fallbackReason);
         databaseMenuItems = DEFAULT_MENU_FALLBACK;
         currentMenuPage = 1;
         menuTotalPages = 1;
-        renderMenuItems(DEFAULT_MENU_FALLBACK, fallbackReason);
+        try {
+            renderMenuItems(DEFAULT_MENU_FALLBACK, fallbackReason);
+        } catch (fallbackRenderErr) {
+            console.error("Fallback render error:", fallbackRenderErr);
+        }
         if (typeof renderPaginationControls === "function") {
             renderPaginationControls("menuPagination", 1, 1, databaseMenuItems.length, loadMenuFromDatabase);
         }
-    } finally {
-        clearTimeout(timeoutId);
+        return;
+    }
+
+    // Handle Empty Menu List
+    if (menuItems.length === 0) {
+        databaseMenuItems = [];
+        currentMenuPage = pageHeaders.page || 1;
+        menuTotalPages = 1;
+        menuGrid.replaceChildren();
+        const emptyMessage = document.createElement("p");
+        emptyMessage.style.cssText = "text-align:center;grid-column:1/-1;padding:30px 10px;color:#aaa;";
+        emptyMessage.textContent = "No dishes found";
+        menuGrid.appendChild(emptyMessage);
+        if (typeof renderPaginationControls === "function") {
+            renderPaginationControls("menuPagination", 1, 1, 0, loadMenuFromDatabase);
+        }
+        return;
+    }
+
+    // STEP 2: RENDER STEP (isolated from fetch failure handling)
+    databaseMenuItems = menuItems;
+    currentMenuPage = pageHeaders.page || page;
+    menuTotalPages = pageHeaders.totalPages || 1;
+
+    try {
+        renderMenuItems(databaseMenuItems);
+        if (typeof renderPaginationControls === "function") {
+            renderPaginationControls("menuPagination", currentMenuPage, menuTotalPages, pageHeaders.totalCount, loadMenuFromDatabase);
+        }
+        console.log("Menu successfully loaded from MongoDB Atlas:", databaseMenuItems.length, "dishes");
+    } catch (renderError) {
+        console.error("Menu rendering exception:", renderError);
+        menuGrid.replaceChildren();
+        const errorNotice = document.createElement("div");
+        errorNotice.style.cssText = "grid-column: 1 / -1; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px 20px; text-align: center; color: #fca5a5; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 10px;";
+        const errorText = document.createElement("span");
+        errorText.textContent = "Display error, please refresh";
+        const refreshBtn = document.createElement("button");
+        refreshBtn.type = "button";
+        refreshBtn.textContent = "🔄 Refresh";
+        refreshBtn.style.cssText = "background:#d4af37;color:#120b06;border:none;padding:6px 16px;border-radius:15px;font-weight:700;cursor:pointer;";
+        refreshBtn.addEventListener("click", () => loadMenuFromDatabase(page));
+        errorNotice.append(errorText, refreshBtn);
+        menuGrid.appendChild(errorNotice);
     }
 }
 

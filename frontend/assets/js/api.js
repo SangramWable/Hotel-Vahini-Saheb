@@ -20,6 +20,7 @@
 
         if (/[\u0000-\u0020\\]/.test(trimmed)) return false;
         if (trimmed.startsWith("//")) return false;
+        if (!/^(?:https?:\/\/|\/|\.\/|\.\.\/)/.test(trimmed)) return false;
 
         try {
             const base = (global.location && global.location.href)

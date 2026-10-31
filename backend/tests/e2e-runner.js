@@ -1,3 +1,4 @@
+/* global document */
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -29,28 +30,35 @@ dishNames.forEach((name, idx) => {
         cat = 'nonveg';
     }
 
+    const hasDesc = idx % 7 !== 0; // Some dishes have no description as required
+    const imgPath = `/assets/images/vahinisaheb${(idx % 8) + 1}.jpeg`;
+
     mockDishes.push({
         _id: `mock_dish_${idx + 1}`,
         id: `mock_dish_${idx + 1}`,
         name: name,
         category: cat,
         price: 120 + (idx * 5) % 300,
-        description: dishData[name] || "Authentic Maharashtrian delicacy prepared with traditional roasted spices.",
-        photo: `/assets/images/vahinisaheb${(idx % 8) + 1}.jpeg`
+        description: hasDesc ? (dishData[name] || "Authentic Maharashtrian delicacy prepared with traditional roasted spices.") : "",
+        image: imgPath,
+        photo: imgPath
     });
 });
 
 // Pad or trim to exactly 130 dishes (41 veg, 77 nonveg, 7 breads, 5 drinks)
 while (mockDishes.length < 130) {
     const idx = mockDishes.length;
+    const hasDesc = idx % 7 !== 0;
+    const imgPath = `/assets/images/vahinisaheb${(idx % 8) + 1}.jpeg`;
     mockDishes.push({
         _id: `mock_dish_${idx + 1}`,
         id: `mock_dish_${idx + 1}`,
         name: `Special Dish ${idx + 1}`,
         category: 'veg',
         price: 180,
-        description: "Freshly prepared homestyle specialty.",
-        photo: `/assets/images/vahinisaheb1.jpeg`
+        description: hasDesc ? "Freshly prepared homestyle specialty." : "No description provided.",
+        image: imgPath,
+        photo: imgPath
     });
 }
 if (mockDishes.length > 130) {
@@ -58,6 +66,7 @@ if (mockDishes.length > 130) {
 }
 
 let simulateApiError = false;
+let simulateEmptyMenu = false;
 
 // Simple local static & API server
 function createServer() {
@@ -71,6 +80,18 @@ function createServer() {
             if (simulateApiError) {
                 res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
                 res.end(JSON.stringify({ error: 'Simulated server error' }));
+                return;
+            }
+
+            if (simulateEmptyMenu) {
+                res.writeHead(200, {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Total-Count': '0',
+                    'X-Total-Pages': '1',
+                    'X-Page': '1'
+                });
+                res.end(JSON.stringify([]));
                 return;
             }
 
@@ -178,9 +199,145 @@ async function runTests() {
 
     try {
         // ==========================================
-        // TEST SUITE 1: BUILD YOUR MEAL PAGE
+        // TEST SUITE 1: CUSTOMER MENU PAGE (menu.html)
         // ==========================================
-        console.log('\n[TEST 1] Testing build-your-meal.html...');
+        console.log('\n[TEST 1] Testing menu.html (Customer Menu Page)...');
+        consoleErrors = [];
+
+        await page.goto('http://127.0.0.1:4567/pages/menu.html');
+        await page.waitForSelector('.food-card', { timeout: 10000 });
+
+        // 1. Assert dishes render on page 1 (100 items per page limit)
+        const menuCardCount = await page.locator('.food-card').count();
+        console.log(`  ✓ Page 1 loaded food cards count: ${menuCardCount} (expected 100)`);
+        if (menuCardCount !== 100) throw new Error(`Expected 100 food cards on page 1, found ${menuCardCount}`);
+
+        // 2. Assert dishes render with images
+        const cardImages = await page.locator('.food-card .food-img img, .food-card .food-img .food-fallback-emoji').count();
+        console.log(`  ✓ Food card image/emoji elements rendered: ${cardImages} (expected 100)`);
+        if (cardImages !== 100) throw new Error(`Expected 100 images or fallback emojis, found ${cardImages}`);
+
+        // 3. Assert fallback banner is NOT shown
+        const fallbackBannerVisible = await page.locator('text="Showing signature menu preview"').isVisible();
+        console.log(`  ✓ Fallback banner visible: ${fallbackBannerVisible} (expected false)`);
+        if (fallbackBannerVisible) throw new Error("Fallback banner is unexpectedly shown on menu.html!");
+
+        // 4. Assert zero console errors or uncaught page errors
+        if (consoleErrors.length > 0) throw new Error(`Menu happy path produced console errors: ${JSON.stringify(consoleErrors)}`);
+        console.log(`  ✓ Menu happy path: 0 console errors`);
+
+        // 5. Test Category Filters
+        // Test Non-Veg filter
+        await page.locator('.filter-btn[onclick*="\'nonveg\'"]').click();
+        const nonvegVisibleCount = await page.locator('.food-card:visible').count();
+        console.log(`  ✓ Filtered Non-Veg: ${nonvegVisibleCount} dishes visible`);
+        if (nonvegVisibleCount === 0) throw new Error("Expected visible Non-Veg dishes");
+        const nonvegCardCategories = await page.locator('.food-card:visible').evaluateAll(els => els.map(e => e.dataset.category));
+        const allAreNonveg = nonvegCardCategories.every(c => c === 'nonveg');
+        if (!allAreNonveg) throw new Error("Found non-veg filtered dish without nonveg category");
+
+        // Test Veg filter
+        await page.locator('.filter-btn[onclick*="\'veg\'"]').click();
+        const vegVisibleCount = await page.locator('.food-card:visible').count();
+        console.log(`  ✓ Filtered Veg: ${vegVisibleCount} dishes visible`);
+        if (vegVisibleCount === 0) throw new Error("Expected visible Veg dishes");
+
+        // Test Breads filter
+        await page.locator('.filter-btn[onclick*="\'breads\'"]').click();
+        const breadsVisibleCount = await page.locator('.food-card:visible').count();
+        console.log(`  ✓ Filtered Breads: ${breadsVisibleCount} dishes visible`);
+
+        // Test Beverages filter
+        await page.locator('.filter-btn[onclick*="\'drinks\'"]').click();
+        const drinksVisibleCount = await page.locator('.food-card:visible').count();
+        console.log(`  ✓ Filtered Beverages: ${drinksVisibleCount} dishes visible`);
+
+        // Reset to All
+        await page.locator('.filter-btn[onclick*="\'all\'"]').click();
+        const allVisibleCount = await page.locator('.food-card:visible').count();
+        if (allVisibleCount !== 100) throw new Error(`Expected 100 dishes visible after resetting to All, got ${allVisibleCount}`);
+        console.log(`  ✓ Filtered All: restored all ${allVisibleCount} dishes on page 1`);
+
+        // 6. Test Search Filtering
+        const menuSearch = page.locator('#menuSearch');
+        await menuSearch.fill('Thali');
+        const searchMatches = await page.locator('.food-card:visible').count();
+        console.log(`  ✓ Search for 'Thali' matched: ${searchMatches} dishes`);
+        if (searchMatches === 0) throw new Error("Search for 'Thali' should match at least 1 dish");
+
+        // Test Empty Search
+        await menuSearch.fill('xyznonexistentquery999');
+        const noResultsVisible = await page.locator('#noResults').isVisible();
+        console.log(`  ✓ Empty search state #noResults visible: ${noResultsVisible}`);
+        if (!noResultsVisible) throw new Error("Expected #noResults to be visible for unmatched query");
+        await menuSearch.fill('');
+        await page.locator('.filter-btn[onclick*="\'all\'"]').click();
+
+        // 7. Test Pagination Controls
+        const paginationStatus = await page.locator('#menuPagination span[aria-live="polite"]').textContent();
+        console.log(`  ✓ Pagination initial status: "${paginationStatus}"`);
+        if (!paginationStatus.includes('Page 1 of 2') || !paginationStatus.includes('130 total')) {
+            throw new Error(`Unexpected pagination text: "${paginationStatus}"`);
+        }
+
+        // Click Next page
+        const nextBtn = page.locator('#menuPagination button[aria-label="Next page"]');
+        await nextBtn.click();
+        await page.waitForFunction(() => document.querySelectorAll('.food-card').length === 30);
+        const page2CardCount = await page.locator('.food-card').count();
+        console.log(`  ✓ Page 2 loaded food cards count: ${page2CardCount} (expected 30)`);
+        if (page2CardCount !== 30) throw new Error(`Expected 30 dishes on page 2, got ${page2CardCount}`);
+
+        const page2Status = await page.locator('#menuPagination span[aria-live="polite"]').textContent();
+        console.log(`  ✓ Page 2 pagination status: "${page2Status}"`);
+        if (!page2Status.includes('Page 2 of 2')) throw new Error("Page 2 status missing 'Page 2 of 2'");
+
+        // Click Previous page
+        const prevBtn = page.locator('#menuPagination button[aria-label="Previous page"]');
+        await prevBtn.click();
+        await page.waitForFunction(() => document.querySelectorAll('.food-card').length === 100);
+        console.log(`  ✓ Successfully navigated back to Page 1 (100 dishes loaded)`);
+
+        // 8. Test API 500 Failure and Fallback Preview
+        console.log('  Testing API 500 error state on menu.html...');
+        simulateApiError = true;
+        await page.goto('http://127.0.0.1:4567/pages/menu.html');
+        await page.waitForSelector('text=Showing signature menu preview. Could not reach the menu server (500)', { timeout: 5000 });
+        const fallbackText = await page.locator('text=Showing signature menu preview').textContent();
+        console.log(`  ✓ Fallback banner displayed correctly: "${fallbackText}"`);
+
+        // Assert fallback dishes rendered
+        const fallbackCardCount = await page.locator('.food-card').count();
+        console.log(`  ✓ Fallback menu cards rendered: ${fallbackCardCount} (expected 9)`);
+        if (fallbackCardCount !== 9) throw new Error(`Expected 9 fallback items, got ${fallbackCardCount}`);
+
+        // 9. Test "Sync Database" button reload
+        console.log('  Testing "Sync Database" button recovery...');
+        simulateApiError = false; // Server recovers
+        const syncBtn = page.locator('button:has-text("Sync Database")');
+        await syncBtn.click();
+
+        await page.waitForFunction(() => document.querySelectorAll('.food-card').length === 100, { timeout: 10000 });
+        const recoveredBannerVisible = await page.locator('text="Showing signature menu preview"').isVisible();
+        console.log(`  ✓ Recovered real menu. Fallback banner visible: ${recoveredBannerVisible}`);
+        if (recoveredBannerVisible) throw new Error("Fallback banner remained visible after Sync Database!");
+
+        // 10. Test Empty API response handling
+        console.log('  Testing empty API menu response...');
+        simulateEmptyMenu = true;
+        await page.goto('http://127.0.0.1:4567/pages/menu.html');
+        await page.waitForSelector('text="No dishes found"', { timeout: 5000 });
+        const emptyMsgVisible = await page.locator('text="No dishes found"').isVisible();
+        const emptyFallbackVisible = await page.locator('text="Showing signature menu preview"').isVisible();
+        console.log(`  ✓ Empty menu shows "No dishes found": ${emptyMsgVisible}, fallback banner visible: ${emptyFallbackVisible}`);
+        if (!emptyMsgVisible) throw new Error("Expected 'No dishes found' message for empty response");
+        if (emptyFallbackVisible) throw new Error("Fallback banner should NOT appear for empty menu response");
+        simulateEmptyMenu = false;
+
+        // ==========================================
+        // TEST SUITE 2: BUILD YOUR MEAL PAGE
+        // ==========================================
+        console.log('\n[TEST 2] Testing build-your-meal.html...');
         consoleErrors = [];
 
         await page.goto('http://127.0.0.1:4567/pages/build-your-meal.html');
@@ -190,6 +347,15 @@ async function runTests() {
         const cardsCount = await page.locator('.dish-pick-card').count();
         console.log(`  ✓ Loaded dish cards count: ${cardsCount} (expected 130)`);
         if (cardsCount !== 130) throw new Error(`Expected 130 dishes loaded, found ${cardsCount}`);
+
+        // 1b. Assert all dishes render with images or emojis and error banner is NOT shown
+        const mealCardImages = await page.locator('.dish-pick-card img, .dish-pick-card .dish-pick-emoji').count();
+        console.log(`  ✓ Dishes rendered with image/emoji: ${mealCardImages} (expected 130)`);
+        if (mealCardImages !== 130) throw new Error(`Expected 130 dish images, got ${mealCardImages}`);
+
+        const bymFallbackVisible = await page.locator('#dishesErrorState').isVisible();
+        console.log(`  ✓ Error fallback state visible: ${bymFallbackVisible} (expected false)`);
+        if (bymFallbackVisible) throw new Error("Fallback banner is unexpectedly visible on build-your-meal.html!");
 
         // 2. Assert category filter pill counts
         const allBadge = await page.locator('#badge-count-all').textContent();
